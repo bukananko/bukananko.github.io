@@ -2,14 +2,14 @@ import { useState } from "react";
 import { FaAlignRight, FaXmark } from "react-icons/fa6";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
   const handleMenu = () => {
-    setIsOpen((prev) => !prev);
+    setIsActive((prev) => !prev);
   };
 
   return (
-    <nav className="py-5 px-4 md:px-10 flex justify-between sticky top-0 bg-white z-50">
+    <nav className="py-5 px-5 flex justify-between fixed right-0 left-0 top-0 bg-white z-50">
       <h1 className="font-extrabold text-xl">
         <a href="#">Anko.dev</a>
       </h1>
@@ -27,28 +27,30 @@ const Navbar = () => {
       </ul>
 
       <button type="button" onClick={handleMenu} className="md:hidden">
-        {isOpen ? (
+        {isActive ? (
           <FaXmark size={24} title="Menu"></FaXmark>
         ) : (
           <FaAlignRight size={24} title="Menu"></FaAlignRight>
         )}
       </button>
 
-      <ul
-      onClick={handleMenu}
+      <div
+        onClick={handleMenu}
         className={`${
-          isOpen ? "block" : "hidden"
-        } absolute right-10 top-20 flex flex-col items-center px-10 gap-5 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-4 rounded-md`}>
-        <li className="hover:text-blue-500">
-          <a href="#about">About</a>
-        </li>
-        <li className="hover:text-blue-500">
-          <a href="#projects">Projects</a>
-        </li>
-        <li className="hover:text-blue-500">
-          <a href="#contact">Contact</a>
-        </li>
-      </ul>
+          isActive ? "block" : "hidden"
+        } absolute top-14 bottom-0 right-0 left-0 min-h-screen`}>
+        <ul className="absolute right-6 flex flex-col items-center px-10 gap-5 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-4 rounded-md">
+          <li className="hover:text-blue-500">
+            <a href="#about">About</a>
+          </li>
+          <li className="hover:text-blue-500">
+            <a href="#projects">Projects</a>
+          </li>
+          <li className="hover:text-blue-500">
+            <a href="#contact">Contact</a>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 };
