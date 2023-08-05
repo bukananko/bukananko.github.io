@@ -1,7 +1,6 @@
 import { FaArrowUpRightFromSquare, FaGithub } from "react-icons/fa6";
 import { projectList } from "../constants";
 
-
 const Projects = () => {
   return (
     <section id="projects" className="py-20">
@@ -19,7 +18,7 @@ const Projects = () => {
               <img
                 src={project.img}
                 alt={project.title}
-                className="w-full h-full rounded-md drop-shadow-2xl shadow-xl shadow-black/40"
+                className="w-full h-full rounded-md drop-shadow-2xl shadow-xl shadow-black/40 object-cover"
               />
             </div>
 
@@ -49,6 +48,7 @@ const Projects = () => {
                   <FaGithub size={22} title="Github" />
                 </a>
               </div>
+              <hr className="border border-gray-200" />
             </div>
           </li>
         ))}

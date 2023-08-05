@@ -10,9 +10,9 @@ const Navbar = () => {
 
   return (
     <nav className="py-5 px-5 flex justify-between fixed right-0 left-0 top-0 bg-white z-50">
-      <h1 className="font-extrabold text-xl">
-        <a href="#">Anko.dev</a>
-      </h1>
+      <a href="#" className="text-xl font-extrabold">
+        Anko.dev
+      </a>
 
       <ul className="hidden md:flex justify-center items-center gap-5">
         <li className="hover:text-blue-500">
@@ -39,7 +39,7 @@ const Navbar = () => {
         className={`${
           isActive ? "block" : "hidden"
         } absolute top-14 bottom-0 right-0 left-0 min-h-screen`}>
-        <ul className="absolute right-6 flex flex-col items-center px-10 gap-5 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-4 rounded-md">
+        <ul className="absolute right-6 flex flex-col items-center px-10 gap-5 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-10 rounded-xl">
           <li className="hover:text-blue-500">
             <a href="#about">About</a>
           </li>

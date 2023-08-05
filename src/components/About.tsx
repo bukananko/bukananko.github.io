@@ -20,12 +20,13 @@ const About = () => {
         improve my skills.
       </p>
 
-      <button className="bg-blue-500 text-white py-2 px-5 rounded-full hover:scale-110 duration-500 flex items-center gap-2 w-max">
-        <a href={CV} download="CV-Anko">
-          Download CV
-        </a>
+      <a
+        href={CV}
+        download="CV-Anko"
+        className="bg-blue-500 text-white py-2 px-5 rounded-full hover:scale-110 duration-500 flex items-center gap-2 w-max">
+        Download CV
         <FaDownload />
-      </button>
+      </a>
     </section>
   );
 };
