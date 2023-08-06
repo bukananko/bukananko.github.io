@@ -1,4 +1,4 @@
-import profile from "/profile.jpg";
+import profile from "../assets/nkrqh.webp";
 import { SiTailwindcss, SiJavascript, SiTypescript } from "react-icons/si";
 import {
   FaGithub,
@@ -40,13 +40,13 @@ const Hero = () => {
             alt="Profile"
             width={300}
             height={300}
-            className="rounded-full"
+            className="animate-bloop shadow-2xl shadow-black drop-shadow-2xl "
           />
         </div>
       </div>
 
-      <div className="flex gap-10 mt-10 md:mt-20 justify-center md:justify-start items-center">
-        <h4 className="font-extrabold md:text-xl">Tech Stack</h4>
+      <div className="flex gap-5 md:gap-10 mt-10 md:mt-20 justify-center md:justify-start items-center">
+        <p className="font-extrabold md:text-xl">Tech Stack</p>
         <span className="text-gray-400">|</span>
 
         <div className="flex flex-wrap gap-5 md:gap-10 flex-1 justify-center md:justify-start">

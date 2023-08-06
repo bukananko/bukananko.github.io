@@ -39,7 +39,7 @@ const Navbar = () => {
         className={`${
           isActive ? "block" : "hidden"
         } absolute top-14 bottom-0 right-0 left-0 min-h-screen`}>
-        <ul className="absolute right-6 flex flex-col items-center px-10 gap-5 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-10 rounded-xl">
+        <ul className="absolute right-6 flex flex-col items-center px-10 gap-7 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-10 rounded-xl">
           <li className="hover:text-blue-500">
             <a href="#about">About</a>
           </li>

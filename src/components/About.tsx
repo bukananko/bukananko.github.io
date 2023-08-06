@@ -1,13 +1,13 @@
-import CV from "/CV-Anko.pdf";
+import CV from "../assets/CV-Anko.pdf";
 import { FaDownload } from "react-icons/fa6";
 
 const About = () => {
   return (
     <section id="about" className="min-h-screen flex flex-col justify-center">
       <h1 className="text-blue-500 font-extrabold text-lg">ABOUT ME</h1>
-      <h3 className="text-xl md:text-2xl font-extrabold">
+      <p className="text-xl md:text-2xl font-extrabold">
         A dedicated Front-End Developer based in Pemalang, Indonesia 📍
-      </h3>
+      </p>
 
       <p className="text-gray-500 py-6">
         As a junior Front-End Developer I possess an impressive arsenal of

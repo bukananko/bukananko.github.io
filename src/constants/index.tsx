@@ -1,5 +1,10 @@
 import { FaReact, FaHtml5 } from "react-icons/fa6";
 import { SiTypescript, SiTailwindcss, SiJavascript } from "react-icons/si";
+import fakestore from "../assets/fakestore.webp";
+import musicplayer from "../assets/musicplayer.webp";
+import dekoor from "../assets/dekoor.webp";
+import weddingcard from "../assets/weddingcard.webp";
+import spotifylanding from "../assets/spotifylanding.webp";
 
 type ProjectListType = {
   title: string;
@@ -14,7 +19,7 @@ export const projectList: ProjectListType[] = [
   {
     title: "Fake Store 🛒",
     desc: "Fake store is an e-commerce web that allows users to buy or sell anything you want and spread it through the internet.",
-    img: "/fakestore.png",
+    img: fakestore,
     github: "https://github.com/nkrqh/fake-store",
     web: "https://afakestore.netlify.app",
     techs: [
@@ -26,7 +31,7 @@ export const projectList: ProjectListType[] = [
   {
     title: "AiMusic 🎵",
     desc: "AiMusic is a music player based on web that allows users to play music, search for the music you like, and manage your own music library.",
-    img: "/musicplayer.png",
+    img: musicplayer,
     github: "https://github.com/nkrqh/music-player",
     web: "https://aimusics.netlify.app",
     techs: [
@@ -42,7 +47,7 @@ export const projectList: ProjectListType[] = [
   {
     title: "Dekoor 🛋️",
     desc: "Dekoor is a landing page web that contains information about furniture.",
-    img: "/dekoor.png",
+    img: dekoor,
     github: "https://github.com/nkrqh/furniture-landing-page",
     web: "https://odekoor.netlify.app/",
     techs: [
@@ -58,7 +63,7 @@ export const projectList: ProjectListType[] = [
   {
     title: "Wedding Invitation Card 💍",
     desc: "A web-based wedding invitation card that you can give online to your friends or family.",
-    img: "/weddingcard.png",
+    img: weddingcard,
     github: "https://github.com/nkrqh/wedding-card",
     web: "https://undangan-nikah-beik.netlify.app/",
     techs: [
@@ -69,7 +74,7 @@ export const projectList: ProjectListType[] = [
   {
     title: "Spotify Landing Page Clone 🎧",
     desc: "Landing page web from the official spotify website which I cloned to learn slicing ui.",
-    img: "/spotifylanding.png",
+    img: spotifylanding,
     github: "https://github.com/nkrqh/cloning-spotify",
     web: "https://nkrqh.github.io/cloning-spotify",
     techs: [

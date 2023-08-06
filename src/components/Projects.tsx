@@ -5,9 +5,9 @@ const Projects = () => {
   return (
     <section id="projects" className="py-20">
       <h1 className="text-blue-500 font-extrabold text-lg">PORTFOLIO</h1>
-      <h3 className="text-xl md:text-2xl font-extrabold">
+      <p className="text-xl md:text-2xl font-extrabold">
         Each Project is a unique piece of development 🧩
-      </h3>
+      </p>
 
       <ul className="space-y-20 mt-10">
         {projectList.map((project) => (
