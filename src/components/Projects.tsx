@@ -4,7 +4,7 @@ import { projectList } from "../constants";
 const Projects = () => {
   return (
     <section id="projects" className="py-20">
-      <h1 className="text-blue-500 font-extrabold text-lg">PORTFOLIO</h1>
+      <h1 className="text-blue-500 font-extrabold text-lg">PROJECTS</h1>
       <p className="text-xl md:text-2xl font-extrabold">
         Each Project is a unique piece of development 🧩
       </p>

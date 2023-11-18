@@ -19,6 +19,9 @@ const Navbar = () => {
           <a href="#about">About</a>
         </li>
         <li className="hover:text-blue-500">
+          <a href="#skills">Skills</a>
+        </li>
+        <li className="hover:text-blue-500">
           <a href="#projects">Projects</a>
         </li>
         <li className="hover:text-blue-500">
@@ -42,6 +45,9 @@ const Navbar = () => {
         <ul className="absolute right-6 flex flex-col items-center px-10 gap-7 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-10 rounded-xl">
           <li className="hover:text-blue-500">
             <a href="#about">About</a>
+          </li>
+          <li className="hover:text-blue-500">
+            <a href="#skills">Skills</a>
           </li>
           <li className="hover:text-blue-500">
             <a href="#projects">Projects</a>

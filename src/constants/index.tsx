@@ -1,19 +1,33 @@
-import { FaReact, FaHtml5 } from "react-icons/fa6";
-import { SiTypescript, SiTailwindcss, SiJavascript } from "react-icons/si";
 import fakestore from "../assets/fakestore.webp";
 import musicplayer from "../assets/musicplayer.webp";
 import dekoor from "../assets/dekoor.webp";
 import weddingcard from "../assets/weddingcard.webp";
 import spotifylanding from "../assets/spotifylanding.webp";
+import {
+  SiTypescript,
+  SiTailwindcss,
+  SiJavascript,
+  SiCss3,
+  SiNodedotjs,
+  SiMongodb,
+  SiExpress,
+  SiHtml5,
+  SiReact,
+} from "react-icons/si";
 
-type ProjectListType = {
+interface ProjectListType {
   title: string;
   desc: string;
   img: string;
   github: string;
   web: string;
   techs: JSX.Element[];
-};
+}
+
+interface SkillListType {
+  title: string;
+  icon: JSX.Element;
+}
 
 export const projectList: ProjectListType[] = [
   {
@@ -23,7 +37,7 @@ export const projectList: ProjectListType[] = [
     github: "https://github.com/nkrqh/fake-store",
     web: "https://afakestore.netlify.app",
     techs: [
-      <FaReact className="fill-sky-500" title="React JS" size={30} />,
+      <SiReact className="fill-sky-500" title="React JS" size={30} />,
       <SiTypescript className="fill-blue-500" title="TypeScript" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
     ],
@@ -35,7 +49,7 @@ export const projectList: ProjectListType[] = [
     github: "https://github.com/nkrqh/music-player",
     web: "https://aimusics.netlify.app",
     techs: [
-      <FaHtml5 className="fill-orange-500" title="HTML" size={30} />,
+      <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
       <SiJavascript
         className="fill-yellow-300 bg-black"
@@ -51,7 +65,7 @@ export const projectList: ProjectListType[] = [
     github: "https://github.com/nkrqh/furniture-landing-page",
     web: "https://odekoor.netlify.app/",
     techs: [
-      <FaHtml5 className="fill-orange-500" title="HTML" size={30} />,
+      <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
       <SiJavascript
         className="fill-yellow-300 bg-black"
@@ -67,7 +81,7 @@ export const projectList: ProjectListType[] = [
     github: "https://github.com/nkrqh/wedding-card",
     web: "https://undangan-nikah-beik.netlify.app/",
     techs: [
-      <FaReact className="fill-sky-500" title="React JS" size={30} />,
+      <SiReact className="fill-sky-500" title="React JS" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
     ],
   },
@@ -78,7 +92,7 @@ export const projectList: ProjectListType[] = [
     github: "https://github.com/nkrqh/cloning-spotify",
     web: "https://nkrqh.github.io/cloning-spotify",
     techs: [
-      <FaHtml5 className="fill-orange-500" title="HTML" size={30} />,
+      <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
       <SiJavascript
         className="fill-yellow-300 bg-black"
@@ -86,5 +100,54 @@ export const projectList: ProjectListType[] = [
         size={30}
       />,
     ],
+  },
+];
+
+export const skillList: SkillListType[] = [
+  {
+    title: "HTML",
+    icon: <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
+  },
+  {
+    title: "CSS",
+    icon: <SiCss3 className="fill-blue-500" title="CSS" size={30} />,
+  },
+  {
+    title: "JavaScript",
+    icon: (
+      <SiJavascript
+        className="fill-yellow-300 bg-black"
+        title="JavaScript"
+        size={30}
+      />
+    ),
+  },
+  {
+    title: "TypeScript",
+    icon: (
+      <SiTypescript className="fill-blue-500" title="TypeScript" size={30} />
+    ),
+  },
+  {
+    title: "Tailwind CSS",
+    icon: (
+      <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />
+    ),
+  },
+  {
+    title: "Mongo DB",
+    icon: <SiMongodb className="fill-green-500" title="Mongo DB" size={30} />,
+  },
+  {
+    title: "Express JS",
+    icon: <SiExpress className="fill-black" title="Express JS" size={30} />,
+  },
+  {
+    title: "React JS",
+    icon: <SiReact className="fill-sky-500" title="React JS" size={30} />,
+  },
+  {
+    title: "Node JS",
+    icon: <SiNodedotjs className="fill-green-500" title="Node JS" size={30} />,
   },
 ];
