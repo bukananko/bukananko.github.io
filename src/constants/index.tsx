@@ -1,8 +1,3 @@
-import fakestore from "../assets/fakestore.webp";
-import musicplayer from "../assets/musicplayer.webp";
-import dekoor from "../assets/dekoor.webp";
-import weddingcard from "../assets/weddingcard.webp";
-import spotifylanding from "../assets/spotifylanding.webp";
 import {
   SiTypescript,
   SiTailwindcss,
@@ -13,6 +8,7 @@ import {
   SiExpress,
   SiHtml5,
   SiReact,
+  SiNextdotjs,
 } from "react-icons/si";
 
 interface ProjectListType {
@@ -31,54 +27,58 @@ interface SkillListType {
 
 export const projectList: ProjectListType[] = [
   {
+    title: "Netai 📝",
+    desc: "Netai is a social media platform for sharing photos, your feelings, and connecting with friends",
+    img: "/sosmed.webp",
+    github: "https://github.com/bukananko/sosmed",
+    web: "https://netai.vercel.app",
+    techs: [
+      <SiMongodb className="fill-green-500" title="Mongo DB" size={30} />,
+      <SiExpress className="dark:fill-white" title="Express JS" size={30} />,
+      <SiNextdotjs className="dark:fill-white" title="Next JS" size={30} />,
+      <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
+    ],
+  },
+  {
     title: "Fake Store 🛒",
     desc: "Fake store is an e-commerce web that allows users to buy or sell anything you want and spread it through the internet.",
-    img: fakestore,
-    github: "https://github.com/nkrqh/fake-store",
+    img: "/fakestore.webp",
+    github: "https://github.com/bukananko/fake-store",
     web: "https://afakestore.netlify.app",
     techs: [
       <SiReact className="fill-sky-500" title="React JS" size={30} />,
-      <SiTypescript className="fill-blue-500" title="TypeScript" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
     ],
   },
   {
     title: "AiMusic 🎵",
     desc: "AiMusic is a music player based on web that allows users to play music, search for the music you like, and manage your own music library.",
-    img: musicplayer,
-    github: "https://github.com/nkrqh/music-player",
+    img: "/musicplayer.webp",
+    github: "https://github.com/bukananko/music-player",
     web: "https://aimusics.netlify.app",
     techs: [
       <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
-      <SiJavascript
-        className="fill-yellow-300 bg-black"
-        title="JavaScript"
-        size={30}
-      />,
+      <SiJavascript className="fill-yellow-300 bg-black" title="JavaScript" size={30} />,
     ],
   },
   {
     title: "Dekoor 🛋️",
     desc: "Dekoor is a landing page web that contains information about furniture.",
-    img: dekoor,
-    github: "https://github.com/nkrqh/furniture-landing-page",
+    img: "/dekoor.webp",
+    github: "https://github.com/bukananko/furniture-landing-page",
     web: "https://odekoor.netlify.app/",
     techs: [
       <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
-      <SiJavascript
-        className="fill-yellow-300 bg-black"
-        title="JavaScript"
-        size={30}
-      />,
+      <SiJavascript className="fill-yellow-300 bg-black" title="JavaScript" size={30} />,
     ],
   },
   {
     title: "Wedding Invitation Card 💍",
     desc: "A web-based wedding invitation card that you can give online to your friends or family.",
-    img: weddingcard,
-    github: "https://github.com/nkrqh/wedding-card",
+    img: "/weddingcard.webp",
+    github: "https://github.com/bukananko/wedding-card",
     web: "https://undangan-nikah-beik.netlify.app/",
     techs: [
       <SiReact className="fill-sky-500" title="React JS" size={30} />,
@@ -88,17 +88,13 @@ export const projectList: ProjectListType[] = [
   {
     title: "Spotify Landing Page Clone 🎧",
     desc: "Landing page web from the official spotify website which I cloned to learn slicing ui.",
-    img: spotifylanding,
-    github: "https://github.com/nkrqh/cloning-spotify",
-    web: "https://nkrqh.github.io/cloning-spotify",
+    img: "/spotifylanding.webp",
+    github: "https://github.com/bukananko/cloning-spotify",
+    web: "https://bukananko.github.io/cloning-spotify",
     techs: [
       <SiHtml5 className="fill-orange-500" title="HTML" size={30} />,
       <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />,
-      <SiJavascript
-        className="fill-yellow-300 bg-black"
-        title="JavaScript"
-        size={30}
-      />,
+      <SiJavascript className="fill-yellow-300 bg-black" title="JavaScript" size={30} />,
     ],
   },
 ];
@@ -114,25 +110,15 @@ export const skillList: SkillListType[] = [
   },
   {
     title: "JavaScript",
-    icon: (
-      <SiJavascript
-        className="fill-yellow-300 bg-black"
-        title="JavaScript"
-        size={30}
-      />
-    ),
+    icon: <SiJavascript className="fill-yellow-300 bg-black" title="JavaScript" size={30} />
   },
   {
     title: "TypeScript",
-    icon: (
-      <SiTypescript className="fill-blue-500" title="TypeScript" size={30} />
-    ),
+    icon: <SiTypescript className="fill-blue-500" title="TypeScript" size={30} />
   },
   {
     title: "Tailwind CSS",
-    icon: (
-      <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />
-    ),
+    icon: <SiTailwindcss className="fill-sky-500" title="Tailwind CSS" size={30} />
   },
   {
     title: "Mongo DB",
@@ -140,11 +126,15 @@ export const skillList: SkillListType[] = [
   },
   {
     title: "Express JS",
-    icon: <SiExpress className="fill-black" title="Express JS" size={30} />,
+    icon: <SiExpress className="dark:fill-white" title="Express JS" size={30} />
   },
   {
     title: "React JS",
     icon: <SiReact className="fill-sky-500" title="React JS" size={30} />,
+  },
+  {
+    title: "Next JS",
+    icon: <SiNextdotjs className="dark:fill-white" title="Next JS" size={30} />,
   },
   {
     title: "Node JS",

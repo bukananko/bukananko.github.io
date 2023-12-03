@@ -9,23 +9,17 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="py-5 px-5 flex justify-between fixed right-0 left-0 top-0 bg-white z-50">
+    <nav className="py-3 px-5 lg:px-40 flex justify-between fixed right-0 left-0 top-0 bg-white dark:bg-[#121212] z-50 mb-10">
       <a href="#" className="text-xl font-extrabold">
-        Anko.dev
+        <img src="./logo.webp" alt="ai" width={40} height={40} />
       </a>
 
       <ul className="hidden md:flex justify-center items-center gap-5">
-        <li className="hover:text-blue-500">
-          <a href="#about">About</a>
-        </li>
         <li className="hover:text-blue-500">
           <a href="#skills">Skills</a>
         </li>
         <li className="hover:text-blue-500">
           <a href="#projects">Projects</a>
-        </li>
-        <li className="hover:text-blue-500">
-          <a href="#contact">Contact</a>
         </li>
       </ul>
 
@@ -42,18 +36,12 @@ const Navbar = () => {
         className={`${
           isActive ? "block" : "hidden"
         } absolute top-14 bottom-0 right-0 left-0 min-h-screen`}>
-        <ul className="absolute right-6 flex flex-col items-center px-10 gap-7 bg-white shadow-xl shadow-black/30 drop-shadow-2xl py-10 rounded-xl">
-          <li className="hover:text-blue-500">
-            <a href="#about">About</a>
-          </li>
+        <ul className="absolute right-6 flex flex-col items-center px-10 gap-7 bg-white dark:bg-[#121212] shadow-xl shadow-black/30 dark:shadow-white/20 drop-shadow-2xl py-10 rounded-xl">
           <li className="hover:text-blue-500">
             <a href="#skills">Skills</a>
           </li>
           <li className="hover:text-blue-500">
             <a href="#projects">Projects</a>
-          </li>
-          <li className="hover:text-blue-500">
-            <a href="#contact">Contact</a>
           </li>
         </ul>
       </div>

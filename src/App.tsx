@@ -1,18 +1,20 @@
-import About from "./components/About";
-import Contact from "./components/Contact";
+import Footer from "./components/Footer";
 import Hero from "./components/Hero";
+import Navbar from "./components/Navbar";
 import Projects from "./components/Projects";
 import Skills from "./components/Skills";
 
 function App() {
   return (
-    <main className="flex flex-col px-5 xl:px-80 justify-center relative">
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Contact />
-    </main>
+    <>
+      <Navbar />
+      <main className="px-5 xl:px-80 relative bg-[url('/lightbg.svg')] dark:bg-[url('/darkbg.svg')] bg-cover bg-center md:bg-contain">
+        <Hero />
+        <Skills />
+        <Projects />
+      </main>
+      <Footer />
+    </>
   );
 }
 

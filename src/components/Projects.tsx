@@ -18,13 +18,13 @@ const Projects = () => {
               <img
                 src={project.img}
                 alt={project.title}
-                className="w-full h-full rounded-md drop-shadow-2xl shadow-xl shadow-black/40 object-cover"
+                className="w-full h-full rounded-md drop-shadow-2xl shadow-xl shadow-black/40 dark:shadow-white/10 object-cover"
               />
             </div>
 
             <div className="md:w-2/5 flex flex-col justify-center text-center gap-4">
               <h1 className="text-xl font-extrabold">{project.title}</h1>
-              <p className="text-gray-500">{project.desc}</p>
+              <p className="text-gray-500 dark:text-gray-400">{project.desc}</p>
 
               <div className="flex justify-center gap-3">
                 {project.techs.map((tech, i) => (
@@ -48,7 +48,7 @@ const Projects = () => {
                   <FaGithub size={22} title="Github" />
                 </a>
               </div>
-              <hr className="border border-gray-200" />
+              <hr className="border border-black/20 dark:border-white/20" />
             </div>
           </li>
         ))}

@@ -1,23 +1,15 @@
-import {
-  FaEnvelopeOpenText,
-  FaGithub,
-  FaLinkedin,
-  FaWhatsapp,
-} from "react-icons/fa6";
+import { FaEnvelopeOpenText, FaGithub, FaTelegram } from "react-icons/fa6";
 
 const Footer = () => {
   return (
-    <footer className="flex justify-between flex-col-reverse md:flex-row gap-4 items-center md:px-40 py-5 bg-black text-white">
+    <footer className="flex justify-between flex-col-reverse md:flex-row gap-4 items-center px-5 lg:px-40 py-5 dark:bg-[#121212] border-t border-t-gray-200 dark:border-t-white/10">
       <p className="font-extrabold text-sm">
-        &copy; 2023 Anko.dev. All rights reserved
+        &copy; {new Date().getFullYear()} Bukan Anko
       </p>
 
       <div className="flex gap-5">
-        <a href="https://linkedin.com/in/angkomj" target="_blank">
-          <FaLinkedin size={25} title="LinkedIn" className="fill-blue-500" />
-        </a>
-        <a href="https://github.com/nkrqh" target="_blank">
-          <FaGithub size={25} title="Github" />
+        <a href="https://github.com/bukananko" target="_blank">
+          <FaGithub size={26} title="Github" />
         </a>
         <a
           href="mailto:ankoo890@gmail.com"
@@ -30,10 +22,10 @@ const Footer = () => {
           />
         </a>
         <a
-          href="https://wa.me/6289630138117"
+          href="https://t.me/bukananko"
           target="_blank"
           className="flex gap-5 items-center">
-          <FaWhatsapp size={25} title="Whatsapp" className="fill-green-500" />
+          <FaTelegram size={26} title="Telegram" className="fill-sky-500" />
         </a>
       </div>
     </footer>
