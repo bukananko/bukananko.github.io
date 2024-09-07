@@ -17,19 +17,7 @@ import { Icon } from "@iconify/vue";
         href="mailto:ankoo890@gmail.com"
         target="_blank"
         class="flex gap-5 items-center">
-        <Icon icon="mdi:email-newsletter" width="35" class="text-blue-500" />
-      </a>
-      <a
-        href="https://t.me/bukananko"
-        target="_blank"
-        class="flex gap-5 items-center">
-        <Icon icon="ic:outline-telegram" width="35" class="text-sky-500" />
-      </a>
-      <a
-        href="https://wa.me/+6289630138117"
-        target="_blank"
-        class="flex gap-2 items-center">
-        <Icon icon="ic:baseline-whatsapp" width="35" class="text-green-500" />
+        <Icon icon="logos:google-gmail" width="35" />
       </a>
     </div>
   </footer>
