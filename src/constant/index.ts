@@ -119,7 +119,7 @@ export const skillList = [
     icon: "vscode-icons:file-type-tailwind",
   },
   {
-    title: "Mongo DB",
+    title: "MongoDB",
     icon: "vscode-icons:file-type-mongo",
   },
   {
@@ -141,5 +141,13 @@ export const skillList = [
   {
     title: "Node JS",
     icon: "vscode-icons:file-type-node",
+  },
+  {
+    title: "Prisma",
+    icon: "lineicons:prisma",
+  },
+  {
+    title: "PostgreSQL",
+    icon: "devicon:postgresql",
   },
 ];

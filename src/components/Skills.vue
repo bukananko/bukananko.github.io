@@ -14,7 +14,7 @@ import { skillList } from "@/constant";
       <div
         v-for="(skill, i) in skillList"
         :key="i"
-        class="flex gap-2 items-center py-2 px-3 bg-black/10 dark:bg-white/10 rounded-md w-max hover:bg-black/20 dark:hover:bg-white/20">
+        class="flex gap-2 items-center py-2 px-3 bg-black/5 dark:bg-white/10 rounded-md w-max hover:bg-black/10 dark:hover:bg-white/15">
         <Icon :icon="skill.icon" width="35" />
         <p>{{ skill.title }}</p>
       </div>

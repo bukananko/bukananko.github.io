@@ -11,3 +11,15 @@
     @apply bg-[url('./assets/lightbg.svg')] dark:bg-[url('./assets/darkbg.svg')] bg-cover;
   }
 }
+
+@layer components {
+  .cursor {
+    animation: cursor 0.4s step-end infinite alternate;
+  }
+
+  @keyframes cursor {
+    50% {
+      border-color: transparent;
+    }
+  }
+}
