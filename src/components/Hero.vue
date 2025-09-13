@@ -26,7 +26,7 @@ const text = [
 
         <p class="text-gray-500 dark:text-gray-400 mr-10">
           I'm interested with the modern web development. I build app using on
-          demand technologies such as Vue JS, React JS, Next JS and Tailwind
+          demand technologies such as Vue JS, React JS, Next JS, Svelte/Kit and Tailwind
           CSS. Feel free to contact me :)
         </p>
 
