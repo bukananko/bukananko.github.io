@@ -27,9 +27,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- Fixed Background Images with Lazy Loading -->
-  <img v-if="bgLoaded" :src="lightbg" alt="" class="fixed inset-0 w-full h-full object-cover -z-10 dark:hidden" loading="lazy" />
-  <img v-if="bgLoaded" :src="darkbg" alt="" class="fixed inset-0 w-full h-full object-cover -z-10 hidden dark:block" loading="lazy" />
+  <img v-if="bgLoaded" :src="lightbg" alt="doodle" class="fixed inset-0 w-full h-full object-cover scale-[300%] origin-center md:scale-[200%] lg:scale-100 -z-10 dark:hidden" loading="lazy" />
+  <img v-if="bgLoaded" :src="darkbg" alt="doodle" class="fixed inset-0 w-full h-full object-cover scale-[300%] origin-center md:scale-[200%] lg:scale-100 -z-10 hidden dark:block" loading="lazy" />
 
   <Navbar />
   <main class="px-5 xl:px-80 relative">
