@@ -6,10 +6,6 @@
   html {
     @apply scroll-smooth font-mono;
   }
-
-  main {
-    @apply bg-[url('./assets/lightbg.svg')] dark:bg-[url('./assets/darkbg.svg')] bg-cover;
-  }
 }
 
 @layer components {
