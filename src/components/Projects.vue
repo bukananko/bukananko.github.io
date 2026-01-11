@@ -70,27 +70,27 @@ const setImageRef = (el: any, index: number) => {
     <p class="text-xl md:text-2xl font-extrabold">Each Project is a unique piece of development 🧩</p>
 
     <ul class="space-y-20 mt-10">
-      <li v-for="(project, i) in projectList" :key="i" class="flex flex-col md:flex-row gap-10 md:gap-20 md:even:flex-row-reverse">
-        <div class="md:w-3/5">
-          <img :ref="(el) => setImageRef(el, i)" :data-src="project.img" :data-index="i" :alt="project.title" width="500" height="500" :class="['aspect-video rounded-md drop-shadow-2xl shadow-xl shadow-black/40 dark:shadow-white/10 object-cover transition-opacity duration-500', loadedImages.has(i) ? 'opacity-100' : 'opacity-0 blur-sm']" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)" />
+      <li v-for="(project, i) in projectList" :key="i" :class="i % 2 === 0 ? 'md:grid-cols-[1fr_0.7fr]' : 'md:grid-cols-[0.7fr_1fr]'" class="grid place-items-center gap-10">
+        <div :class="i % 2 === 0 ? 'md:order-1' : 'md:order-2'">
+          <img :ref="(el) => setImageRef(el, i)" :data-src="project.img" :data-index="i" :alt="project.title" width="500" height="500" :class="['aspect-video rounded-xl drop-shadow-2xl shadow-xl shadow-black/40 dark:shadow-white/10 object-cover transition-opacity duration-500 w-full', loadedImages.has(i) ? 'opacity-100' : 'opacity-0 blur-sm', i % 2 === 0 ? '' : 'ml-auto']" style="background: gainsboro" />
         </div>
 
-        <div class="md:w-2/5 flex flex-col justify-center text-center gap-4">
+        <div :class="i % 2 === 0 ? 'md:order-2' : 'md:order-1'" class="text-center grid gap-4">
           <h1 class="text-xl font-extrabold">{{ project.title }}</h1>
           <p class="text-gray-500 dark:text-gray-400">{{ project.desc }}</p>
 
-          <div class="flex justify-center gap-3">
+          <div class="flex items-center justify-center gap-3">
             <Icon v-for="(tech, i) in project.techs" :icon="tech" :key="i" width="35" class="hover:scale-125 duration-300 transition-all" />
           </div>
 
-          <div class="flex gap-5 mt-5 justify-center">
+          <div class="flex gap-5 mt-7 items-center justify-center">
             <a :href="project.web" target="_blank" class="flex gap-1 items-center hover:text-blue-500">
               Live Demo
-              <Icon icon="heroicons:arrow-top-right-on-square-16-solid" width="30" />
+              <Icon icon="ci:external-link" width="25" />
             </a>
             <a :href="project.github" target="_blank" class="flex items-center gap-1 hover:text-gray-500">
               Code
-              <Icon icon="mdi:github" width="30" />
+              <Icon icon="mdi:github" width="25" />
             </a>
           </div>
           <hr class="border border-black/20 dark:border-white/20" />

@@ -31,7 +31,7 @@ onMounted(() => {
   <img v-if="bgLoaded" :src="darkbg" alt="doodle" class="fixed inset-0 w-full h-full object-cover scale-[300%] origin-center md:scale-[200%] lg:scale-100 -z-10 hidden dark:block" loading="lazy" />
 
   <Navbar />
-  <main class="px-5 xl:px-80 relative">
+  <main class="px-5 lg:px-40 relative container mx-auto">
     <Hero />
     <Skills />
     <Projects />
