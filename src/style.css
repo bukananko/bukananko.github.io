@@ -18,4 +18,100 @@
       border-color: transparent;
     }
   }
+
+  .tooltip {
+    @apply relative inline-block;
+    --tooltip-offset: 7px;
+  }
+
+  .tooltip::before {
+    content: attr(data-tip);
+    position: absolute;
+    pointer-events: none;
+
+    left: 50%;
+    top: 0;
+
+    /* custom transform (default TOP) */
+    transform: translate(-50%, calc(-100% - var(--tooltip-offset)));
+
+    @apply rounded bg-neutral-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-150 dark:bg-white dark:text-black z-50;
+  }
+
+  .tooltip:hover::before,
+  .tooltip:focus-visible::before {
+    @apply opacity-100;
+  }
+
+  /* Arrow */
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+
+    left: 50%;
+    top: 0;
+
+    /* default TOP arrow */
+    transform: translate(-50%, calc(-2px - var(--tooltip-offset)));
+
+    @apply border-4 border-transparent opacity-0 transition-opacity duration-150 border-t-neutral-800 dark:border-t-white;
+  }
+
+  .tooltip:hover::after,
+  .tooltip:focus-visible::after {
+    @apply opacity-100;
+  }
+
+  /* POSITION VARIANTS ----------------------------------- */
+
+  /* TOP */
+  .tooltip-top::before {
+    transform: translate(-50%, calc(-100% - var(--tooltip-offset)));
+  }
+  .tooltip-top::after {
+    transform: translate(-50%, calc(-2px - var(--tooltip-offset)));
+    @apply border-t-neutral-800 dark:border-t-white border-b-transparent;
+  }
+
+  /* BOTTOM */
+  .tooltip-bottom::before {
+    top: auto;
+    bottom: 0;
+    transform: translate(-50%, calc(100% + var(--tooltip-offset)));
+  }
+  .tooltip-bottom::after {
+    top: auto;
+    bottom: 0;
+    transform: translate(-50%, calc(2px + var(--tooltip-offset)));
+    @apply border-b-neutral-800 dark:border-b-white border-t-transparent;
+  }
+
+  /* LEFT */
+  .tooltip-left::before {
+    left: 0;
+    top: 50%;
+    transform: translate(calc(-100% - var(--tooltip-offset)), -50%);
+  }
+  .tooltip-left::after {
+    left: 0;
+    top: 50%;
+    transform: translate(calc(-2px - var(--tooltip-offset)), -50%);
+    @apply border-l-neutral-800 dark:border-l-white border-t-transparent;
+  }
+
+  /* RIGHT */
+  .tooltip-right::before {
+    right: 0;
+    top: 50%;
+    left: auto;
+    transform: translate(calc(100% + var(--tooltip-offset)), -50%);
+  }
+  .tooltip-right::after {
+    right: 0;
+    left: auto;
+    top: 50%;
+    transform: translate(calc(2px + var(--tooltip-offset)), -50%);
+    @apply border-r-neutral-800 dark:border-r-white border-t-transparent;
+  }
 }
