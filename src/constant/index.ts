@@ -7,14 +7,31 @@ import dekoor from '@/assets/dekoor.webp';
 import weddingcard from '@/assets/weddingcard.webp';
 import spotifylanding from '@/assets/spotifylanding.webp';
 
-export const projectList = [
+export type Project = {
+  title: string;
+  desc: string;
+  img: string;
+  github: string;
+  web: string;
+  techs: string[];
+};
+
+export type Skill = {
+  key: string;
+  title: string;
+  icon: string;
+};
+
+export type Contact = Skill & { href: string };
+
+export const projects: Project[] = [
   {
     title: 'Agenone 📊',
     desc: 'Agenone is a digital agency that will make your business grow and succeed in the digital age.',
     img: agenone,
     github: 'https://github.com/bukananko/agenone',
     web: 'https://aagenone.vercel.app/',
-    techs: ['devicon:vuejs', 'vscode-icons:file-type-tailwind'],
+    techs: ['vue', 'tailwind'],
   },
   {
     title: 'Modfod 🥗',
@@ -22,7 +39,7 @@ export const projectList = [
     img: modfod,
     github: 'https://github.com/bukananko/modfod',
     web: 'https://modfod.netlify.app/',
-    techs: ['ri:nextjs-fill', 'vscode-icons:file-type-tailwind'],
+    techs: ['next', 'tailwind'],
   },
   {
     title: 'Netai 📝',
@@ -30,7 +47,7 @@ export const projectList = [
     img: sosmed,
     github: 'https://github.com/bukananko/sosmed',
     web: 'https://netai.vercel.app',
-    techs: ['ri:nextjs-fill', 'vscode-icons:file-type-tailwind', 'vscode-icons:file-type-mongo', 'skill-icons:expressjs-light'],
+    techs: ['next', 'tailwind', 'mongo', 'express'],
   },
   {
     title: 'Fake Store 🛒',
@@ -38,7 +55,7 @@ export const projectList = [
     img: fakestore,
     github: 'https://github.com/bukananko/fake-store',
     web: 'https://afakestore.netlify.app',
-    techs: ['vscode-icons:file-type-reactjs', 'vscode-icons:file-type-tailwind'],
+    techs: ['react', 'tailwind'],
   },
   {
     title: 'AiMusic 🎵',
@@ -46,7 +63,7 @@ export const projectList = [
     img: musicplayer,
     github: 'https://github.com/bukananko/music-player',
     web: 'https://aimusics.netlify.app',
-    techs: ['vscode-icons:file-type-html', 'vscode-icons:file-type-tailwind', 'vscode-icons:file-type-js-official'],
+    techs: ['html', 'tailwind', 'js'],
   },
   {
     title: 'Dekoor 🛋️',
@@ -54,7 +71,7 @@ export const projectList = [
     img: dekoor,
     github: 'https://github.com/bukananko/furniture-landing-page',
     web: 'https://odekoor.netlify.app/',
-    techs: ['vscode-icons:file-type-html', 'vscode-icons:file-type-tailwind', 'vscode-icons:file-type-js-official'],
+    techs: ['html', 'tailwind', 'js'],
   },
   {
     title: 'Wedding Invitation Card 💍',
@@ -62,7 +79,7 @@ export const projectList = [
     img: weddingcard,
     github: 'https://github.com/bukananko/wedding-card',
     web: 'https://undangan-nikah-beik.netlify.app/',
-    techs: ['vscode-icons:file-type-reactjs', 'vscode-icons:file-type-tailwind'],
+    techs: ['react', 'tailwind'],
   },
   {
     title: 'Spotify Landing Page Clone 🎧',
@@ -70,65 +87,28 @@ export const projectList = [
     img: spotifylanding,
     github: 'https://github.com/bukananko/cloning-spotify',
     web: 'https://bukananko.github.io/cloning-spotify',
-    techs: ['vscode-icons:file-type-html', 'vscode-icons:file-type-tailwind', 'vscode-icons:file-type-js-official'],
+    techs: ['html', 'tailwind', 'js'],
   },
 ];
 
-export const skillList = [
-  {
-    title: 'HTML',
-    icon: 'vscode-icons:file-type-html',
-  },
-  {
-    title: 'CSS',
-    icon: 'vscode-icons:file-type-css',
-  },
-  {
-    title: 'JavaScript',
-    icon: 'vscode-icons:file-type-js-official',
-  },
-  {
-    title: 'TypeScript',
-    icon: 'devicon:typescript',
-  },
-  {
-    title: 'Tailwind CSS',
-    icon: 'vscode-icons:file-type-tailwind',
-  },
-  {
-    title: 'MongoDB',
-    icon: 'vscode-icons:file-type-mongo',
-  },
-  {
-    title: 'Express JS',
-    icon: 'skill-icons:expressjs-light',
-  },
-  {
-    title: 'React JS',
-    icon: 'vscode-icons:file-type-reactjs',
-  },
-  {
-    title: 'Next JS',
-    icon: 'ri:nextjs-fill',
-  },
-  {
-    title: 'Vue JS',
-    icon: 'devicon:vuejs',
-  },
-  {
-    title: 'Node JS',
-    icon: 'vscode-icons:file-type-node',
-  },
-  {
-    title: 'Prisma',
-    icon: 'lineicons:prisma',
-  },
-  {
-    title: 'PostgreSQL',
-    icon: 'devicon:postgresql',
-  },
-  {
-    title: 'Svelte/Kit',
-    icon: 'material-icon-theme:svelte',
-  },
+export const skills: Skill[] = [
+  { key: 'html', title: 'HTML', icon: 'vscode-icons:file-type-html' },
+  { key: 'css', title: 'CSS', icon: 'vscode-icons:file-type-css' },
+  { key: 'js', title: 'JavaScript', icon: 'vscode-icons:file-type-js-official' },
+  { key: 'ts', title: 'TypeScript', icon: 'devicon:typescript' },
+  { key: 'tailwind', title: 'Tailwind CSS', icon: 'vscode-icons:file-type-tailwind' },
+  { key: 'mongo', title: 'MongoDB', icon: 'vscode-icons:file-type-mongo' },
+  { key: 'express', title: 'Express JS', icon: 'skill-icons:expressjs-light' },
+  { key: 'react', title: 'React JS', icon: 'vscode-icons:file-type-reactjs' },
+  { key: 'next', title: 'Next JS', icon: 'ri:nextjs-fill' },
+  { key: 'vue', title: 'Vue JS', icon: 'devicon:vuejs' },
+  { key: 'node', title: 'Node JS', icon: 'vscode-icons:file-type-node' },
+  { key: 'prisma', title: 'Prisma', icon: 'lineicons:prisma' },
+  { key: 'postgres', title: 'PostgreSQL', icon: 'devicon:postgresql' },
+  { key: 'svelte', title: 'Svelte/Kit', icon: 'material-icon-theme:svelte' },
+];
+
+export const contacts: Contact[] = [
+  { key: 'email', title: 'Email', icon: 'logos:google-gmail', href: 'mailto:ankoo890@gmail.com' },
+  { key: 'linkedin', title: 'LinkedIn', icon: 'devicon:linkedin', href: 'https://www.linkedin.com/in/angkomj/' },
 ];
