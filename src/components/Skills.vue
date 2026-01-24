@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { skillList } from "@/constant";
+import { skills } from "@/constant";
 </script>
 
 <template>
@@ -12,7 +12,7 @@ import { skillList } from "@/constant";
 
     <div class="flex flex-wrap gap-2 w-full mt-10">
       <div
-        v-for="(skill, i) in skillList"
+        v-for="(skill, i) in skills"
         :key="i"
         class="flex gap-2 items-center py-2 px-3 bg-black/5 dark:bg-white/10 rounded-md w-max hover:bg-black/10 dark:hover:bg-white/15 hover:scale-105 duration-300 transition-all">
         <Icon :icon="skill.icon" width="35" />
