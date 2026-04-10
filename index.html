@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      if (
+        localStorage.getItem('theme') === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
     <meta
       name="description"
       content="Welcome to my portfolio website. Explore my work, skills, and achievements in web development. Contact me for collaborations and opportunities." />
@@ -28,8 +39,8 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="32x30" />
     <title>bukananko</title>
     <meta name="color-scheme" content="dark light" />
-    <script type="module" crossorigin src="/assets/index-bV630LwK.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DxV28SMg.css">
+    <script type="module" crossorigin src="/assets/index-D6IQScDM.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DBdoZEse.css">
   </head>
   <body>
     <div id="app"></div>
