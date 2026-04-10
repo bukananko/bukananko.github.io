@@ -82,7 +82,7 @@ export const projects: Project[] = [
     techs: ['react', 'tailwind'],
   },
   {
-    title: 'Spotify Landing Page Clone 🎧',
+    title: 'Spotify Landing Page 🎧',
     desc: 'Landing page web from the official spotify website which I cloned to learn slicing ui.',
     img: spotifylanding,
     github: 'https://github.com/bukananko/cloning-spotify',
