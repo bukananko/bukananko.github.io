@@ -1,43 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
       // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-      if (
-        localStorage.getItem('theme') === 'dark' ||
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      ) {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
     </script>
-    <meta
-      name="description"
-      content="Welcome to my portfolio website. Explore my work, skills, and achievements in web development. Contact me for collaborations and opportunities." />
-    <link rel="author" href="https://github.com/bukananko" />
+    <!-- Primary Meta Tags -->
+    <title>Bukananko | Frontend Developer & Software Engineer</title>
+    <meta name="title" content="Bukananko | Frontend Developer & Software Engineer" />
+    <meta name="description" content="Professional portfolio of Anko, a Frontend Developer specialized in building high-performance, scalable, and visually stunning web applications using modern technologies." />
+    <meta name="keywords" content="bukananko, Frontend Developer, Software Engineer, Vue.js, React, TypeScript, Web Development, Portfolio, UI/UX" />
     <meta name="author" content="bukananko" />
-    <meta property="og:title" content="bukananko" />
-    <meta
-      property="og:description"
-      content="Welcome to my portfolio website. Explore my work, skills, and achievements in web development. Contact me for collaborations and opportunities." />
-    <meta property="og:url" content="https://bukananko.gitub.io/" />
-    <meta
-      property="og:image"
-      content="https://i.pinimg.com/550x/0b/7c/3b/0b7c3bfdfb2174dd00c1cd374f8ae1ef.jpg" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="canonical" href="https://bukananko.github.io/" />
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bukananko.github.io/" />
+    <meta property="og:title" content="Bukananko | Frontend Developer & Software Engineer" />
+    <meta property="og:description" content="Explore the professional portfolio of Anko. Specialized in modern frontend engineering and creative web solutions." />
+    <meta property="og:image" content="/ai.png" />
+    <meta property="og:site_name" content="Bukananko Portfolio" />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="bukananko" />
-    <meta
-      name="twitter:description"
-      content="Welcome to my portfolio website. Explore my work, skills, and achievements in web development. Contact me for collaborations and opportunities." />
-    <meta
-      name="twitter:image"
-      content="https://i.pinimg.com/550x/0b/7c/3b/0b7c3bfdfb2174dd00c1cd374f8ae1ef.jpg" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="32x30" />
-    <title>bukananko</title>
+    <meta name="twitter:url" content="https://bukananko.github.io/" />
+    <meta name="twitter:title" content="Bukananko | Frontend Developer & Software Engineer" />
+    <meta name="twitter:description" content="Explore the professional portfolio of Anko. Specialized in modern frontend engineering and creative web solutions." />
+    <meta name="twitter:image" content="/ai.png" />
+
+    <!-- Icons & Favicon -->
+    <link rel="icon" href="/ai.png" type="image/x-icon" sizes="32x30" />
+    <link rel="apple-touch-icon" href="/ai.png" />
+    <link rel="author" href="https://github.com/bukananko" />
+
+    <!-- JSON-LD Structured Data (Institutional Grade SEO) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Anko",
+        "url": "https://bukananko.github.io/",
+        "image": "https://bukananko.github.io/ai.png",
+        "sameAs": ["https://github.com/bukananko"],
+        "jobTitle": "Frontend Developer",
+        "description": "Professional Frontend Developer specializing in modern web architecture and user experience.",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Freelance"
+        }
+      }
+    </script>
     <meta name="color-scheme" content="dark light" />
   </head>
   <body>
