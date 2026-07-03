@@ -4,7 +4,7 @@ import { contacts } from '@/constant';
 </script>
 
 <template>
-  <footer class="flex justify-between flex-col-reverse md:flex-row gap-2 items-center px-5 lg:px-20 xl:px-40 py-5 text-neutral-600 dark:text-neutral-400 container mx-auto">
+  <footer class="flex justify-between flex-row gap-2 items-center px-5 lg:px-20 xl:px-40 py-5 text-neutral-600 dark:text-neutral-400 container mx-auto">
     <p class="font-bold">&copy; 2023 - {{ new Date().getFullYear() }} bukananko</p>
 
     <div class="flex gap-6 items-center">
