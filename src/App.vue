@@ -1,40 +1,105 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import Navbar from './components/Navbar.vue';
-import Hero from './components/Hero.vue';
-import Skills from './components/Skills.vue';
-import Projects from './components/Projects.vue';
-import Footer from './components/Footer.vue';
-import lightbg from './assets/lightbg.svg';
-import darkbg from './assets/darkbg.svg';
+import SolarSystemCanvas from './components/SolarSystemCanvas.vue';
+import TelemetryModal from './components/TelemetryModal.vue';
+import MissionControlHUD from './components/MissionControlHUD.vue';
+import { type CelestialBody, solarSystemBodies } from './constant';
 
-const bgLoaded = ref(false);
+const canvasRef = ref<InstanceType<typeof SolarSystemCanvas> | null>(null);
+const selectedBody = ref<CelestialBody | null>(null);
+const isModalOpen = ref(false);
+const orbitSpeedMultiplier = ref(1);
 
-onMounted(() => {
-  // Lazy load background after a short delay or on scroll
-  const loadBackground = () => {
-    bgLoaded.value = true;
-    window.removeEventListener('scroll', loadBackground);
-  };
+// Handle body selection from canvas or HUD
+const onSelectBody = (body: CelestialBody | null) => {
+  selectedBody.value = body;
+  if (body) {
+    isModalOpen.value = true;
+  } else {
+    isModalOpen.value = false;
+  }
+};
 
-  // Load background after 500ms or on first scroll
-  setTimeout(() => {
-    bgLoaded.value = true;
-  }, 500);
+// Close telemetry dossier and recenter camera to Sun
+const onCloseModal = () => {
+  isModalOpen.value = false;
+  selectedBody.value = null;
+  canvasRef.value?.resetView();
+};
 
-  window.addEventListener('scroll', loadBackground, { once: true, passive: true });
-});
+// Recenter canvas camera
+const onResetView = () => {
+  selectedBody.value = null;
+  canvasRef.value?.resetView();
+};
+
+const onZoomIn = () => {
+  canvasRef.value?.zoomIn();
+};
+
+const onZoomOut = () => {
+  canvasRef.value?.zoomOut();
+};
+
+// Cycle orbit speeds: 1x -> 2x -> 0x (pause) -> 1x
+const onToggleSpeed = () => {
+  if (orbitSpeedMultiplier.value === 1) {
+    orbitSpeedMultiplier.value = 2;
+  } else if (orbitSpeedMultiplier.value === 2) {
+    orbitSpeedMultiplier.value = 0;
+  } else {
+    orbitSpeedMultiplier.value = 1;
+  }
+};
+
+// Navbar quick navigation
+const onNavbarNavigate = (target: 'sun' | 'skills' | 'projects') => {
+  if (target === 'sun') {
+    const sun = solarSystemBodies.find((b) => b.id === 'sun');
+    if (sun) onSelectBody(sun);
+  } else if (target === 'skills') {
+    const skillsPlanet = solarSystemBodies.find((b) => b.id === 'skills');
+    if (skillsPlanet) onSelectBody(skillsPlanet);
+  } else if (target === 'projects') {
+    const firstProject = solarSystemBodies.find((b) => b.type === 'project');
+    if (firstProject) onSelectBody(firstProject);
+  }
+};
 </script>
 
 <template>
-  <img v-if="bgLoaded" :src="lightbg" alt="doodle" class="fixed inset-0 w-full h-full object-cover scale-[300%] origin-center md:scale-[200%] lg:scale-100 -z-10 dark:hidden" loading="lazy" />
-  <img v-if="bgLoaded" :src="darkbg" alt="doodle" class="fixed inset-0 w-full h-full object-cover scale-[300%] origin-center md:scale-[200%] lg:scale-100 -z-10 hidden dark:block" loading="lazy" />
+  <div class="relative w-full h-screen font-mono text-white overflow-hidden bg-[#02040a] select-none">
+    <!-- Navbar Header -->
+    <Navbar @navigate="onNavbarNavigate" />
 
-  <Navbar />
-  <main class="px-5 lg:px-20 xl:px-40 relative container mx-auto">
-    <Hero />
-    <Skills />
-    <Projects />
-  </main>
-  <Footer />
+    <!-- INTERACTIVE SOLAR SYSTEM CANVAS (FULLSCREEN PURE EXPERIENCE) -->
+    <main class="fixed inset-0 w-screen h-screen z-0 overflow-hidden">
+      <SolarSystemCanvas
+        ref="canvasRef"
+        :orbit-speed-multiplier="orbitSpeedMultiplier"
+        :selected-body-id="selectedBody?.id"
+        :is-panel-open="isModalOpen"
+        @select="onSelectBody"
+        @unselect="onCloseModal"
+      />
+    </main>
+
+    <!-- Mission Control Bottom HUD -->
+    <MissionControlHUD
+      :orbit-speed-multiplier="orbitSpeedMultiplier"
+      @reset-view="onResetView"
+      @toggle-speed="onToggleSpeed"
+      @zoom-in="onZoomIn"
+      @zoom-out="onZoomOut"
+    />
+
+    <!-- Telemetry Modal / Mission Dossier -->
+    <TelemetryModal
+      :body="selectedBody"
+      :is-open="isModalOpen"
+      @close="onCloseModal"
+      @select="onSelectBody"
+    />
+  </div>
 </template>

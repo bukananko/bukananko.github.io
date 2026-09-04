@@ -1,23 +1,39 @@
 <script setup lang="ts">
 import logo from '@/assets/logo.webp';
-import ThemeToggle from './ThemeToggle.vue';
+import { Icon } from '@iconify/vue';
+
+const emit = defineEmits<{
+  (e: 'navigate', target: 'sun' | 'skills' | 'projects'): void;
+}>();
 </script>
 
 <template>
-  <nav class="py-3 px-5 lg:px-20 xl:px-40 flex justify-between fixed right-0 left-0 top-0 z-50 mb-10 container mx-auto">
-    <a href="#" class="text-xl font-extrabold">
-      <img :src="logo" alt="ai" width="40" height="40" loading="lazy" class="hover:scale-125 duration-300 transition-all" />
-    </a>
+  <header class="fixed top-0 left-0 right-0 z-40 px-4 md:px-8 py-3 pointer-events-none">
+    <div class="max-w-7xl mx-auto flex items-center justify-between pointer-events-auto">
+      <!-- Left: Logo & Telemetry Status -->
+      <a
+        href="#"
+        @click.prevent="emit('navigate', 'sun')"
+        class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:scale-105 transition-all group">
+        <img
+          :src="logo"
+          alt="Anko Logo"
+          width="36"
+          height="36"
+          class="rounded-xl group-hover:rotate-12 transition-transform duration-300" />
+      </a>
 
-    <ul class="flex justify-center items-center gap-5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-lg dark:shadow-neutral-900/50">
-      <li class="hover:text-blue-500 transition-colors font-bold text-neutral-800 dark:text-neutral-200">
-        <a href="#skills">Skills</a>
-      </li>
-      <hr class="h-5 border-l border-neutral-300 dark:border-neutral-700" />
-      <li class="hover:text-blue-500 transition-colors font-bold text-neutral-800 dark:text-neutral-200">
-        <a href="#projects">Projects</a>
-      </li>
-    </ul>
-    <ThemeToggle />
-  </nav>
+      <!-- Right: Interaction Hint Badge -->
+      <div class="flex items-center gap-2">
+        <div
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl cosmic-glass border border-white/10 text-[11px] font-mono text-neutral-400 shadow-lg">
+          <Icon icon="solar:cursor-bold" width="14" class="text-cyan-400" />
+          <span class="hidden sm:inline"
+            >Drag to pan &bull; Scroll to zoom &bull; Click to scan</span
+          >
+          <span class="sm:hidden">Explore Orbit</span>
+        </div>
+      </div>
+    </div>
+  </header>
 </template>
