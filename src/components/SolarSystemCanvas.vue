@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { type CelestialBody, solarSystemBodies } from '@/constant';
+import { buildConstellationSystem, type ConstellationSystem } from '@/space/builders/constellations';
 
 const props = withDefaults(
   defineProps<{
@@ -79,6 +80,7 @@ interface Planet3D {
 const planets3D: Planet3D[] = [];
 let sunMesh: THREE.Mesh | null = null;
 let sunCorona: THREE.Mesh | null = null;
+let constellationSystem: ConstellationSystem | null = null;
 
 // Dynamic Cosmic Particles (Volumetric Space Dust: Inner & Outer System)
 let cosmicDustPoints: THREE.Points | null = null;
@@ -4901,7 +4903,7 @@ const initThreeScene = () => {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x02040a);
 
-  camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 5500);
+  camera = new THREE.PerspectiveCamera(50, width / height, 1, 14000);
   camera.position.set(0, 260, 420);
 
   // 2. Renderer
@@ -4994,6 +4996,12 @@ const initThreeScene = () => {
   });
   const starField = new THREE.Points(starGeo, starMat);
   scene.add(starField);
+
+  // 5A-Constellations: 3D Constellation Sphere Network (Populating all empty areas of deep space)
+  constellationSystem = buildConstellationSystem(getCircularStarlightTexture(), 3850);
+  scene.add(constellationSystem.linesMesh);
+  scene.add(constellationSystem.starsPoints);
+  scene.add(constellationSystem.flaresGroup);
 
   // 5A-Cross: Landmark Astrophotography 4-Point Diffraction Flare Supergiants (14 Major Stars)
   const crossStarPositions = [
@@ -5753,6 +5761,11 @@ const renderLoop = (timestamp: number) => {
 
   if (isTabVisible) {
     simulationTime += dt;
+  }
+
+  // A0. Constellation Network Subtle Stellar Pulse
+  if (constellationSystem) {
+    constellationSystem.update(simulationTime);
   }
 
   // A. Sun Animation
@@ -6975,6 +6988,7 @@ onUnmounted(() => {
   // Clean up Three.js memory
   controls?.dispose();
   renderer?.dispose();
+  constellationSystem?.dispose();
 });
 
 watch(
