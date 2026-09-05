@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { type CelestialBody, solarSystemBodies } from '@/constant';
 import { buildConstellationSystem, type ConstellationSystem } from '@/space/builders/constellations';
+import { buildGalaxySystem, type GalaxySystem } from '@/space/builders/galaxy';
 
 const props = withDefaults(
   defineProps<{
@@ -81,10 +82,13 @@ const planets3D: Planet3D[] = [];
 let sunMesh: THREE.Mesh | null = null;
 let sunCorona: THREE.Mesh | null = null;
 let constellationSystem: ConstellationSystem | null = null;
+let galaxySystem: GalaxySystem | null = null;
 
 // Dynamic Cosmic Particles (Volumetric Space Dust: Inner & Outer System)
 let cosmicDustPoints: THREE.Points | null = null;
 let galacticStreamPoints: THREE.Points | null = null;
+let starFieldPoints: THREE.Points | null = null;
+const solarNebulaSprites: THREE.Sprite[] = [];
 const dustCount = 7500;
 const dustRadii = new Float32Array(dustCount);
 const dustAngles = new Float32Array(dustCount);
@@ -4903,7 +4907,7 @@ const initThreeScene = () => {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x02040a);
 
-  camera = new THREE.PerspectiveCamera(50, width / height, 1, 14000);
+  camera = new THREE.PerspectiveCamera(50, width / height, 1, 180000);
   camera.position.set(0, 260, 420);
 
   // 2. Renderer
@@ -4918,8 +4922,8 @@ const initThreeScene = () => {
   // 3. OrbitControls
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.minDistance = 20; // Close inspection without clipping
-  controls.maxDistance = 3000; // Balanced zoom out limit, prevents system from shrinking away
+  controls.minDistance = 15; // Close inspection without clipping
+  controls.maxDistance = 48000; // Deep cosmic zoom out: voyage from planets to the whole galaxy!
   controls.maxPolarAngle = Math.PI * 0.95;
 
   // Interruption listener: cancel camera fly-to instantly whenever user drags, touches, or scrolls
@@ -4994,14 +4998,18 @@ const initThreeScene = () => {
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
-  const starField = new THREE.Points(starGeo, starMat);
-  scene.add(starField);
+  starFieldPoints = new THREE.Points(starGeo, starMat);
+  scene.add(starFieldPoints);
 
   // 5A-Constellations: 3D Constellation Sphere Network (Populating all empty areas of deep space)
   constellationSystem = buildConstellationSystem(getCircularStarlightTexture(), 3850);
   scene.add(constellationSystem.linesMesh);
   scene.add(constellationSystem.starsPoints);
   scene.add(constellationSystem.flaresGroup);
+
+  // 5A-Galaxy: Volumetric 3D Spiral Galaxy & Deep Cosmic Zoom
+  galaxySystem = buildGalaxySystem();
+  scene.add(galaxySystem.group);
 
   // 5A-Cross: Landmark Astrophotography 4-Point Diffraction Flare Supergiants (14 Major Stars)
   const crossStarPositions = [
@@ -5045,13 +5053,11 @@ const initThreeScene = () => {
   const dustPalette = [
     new THREE.Color(0x00f0ff), // electric cyber cyan
     new THREE.Color(0xffb703), // solar amber gold
-    new THREE.Color(0xf43f5e), // cosmic nebula rose
-    new THREE.Color(0xa855f7), // starlight violet
-    new THREE.Color(0x10b981), // emerald aurora
     new THREE.Color(0xffffff), // pure diamond starlight
     new THREE.Color(0x38bdf8), // sapphire sky blue
     new THREE.Color(0xfcd34d), // warm star yellow
-    new THREE.Color(0xec4899), // radiant magenta
+    new THREE.Color(0xe0f2fe), // starlight ice blue
+    new THREE.Color(0xbae6fd), // pale cyan
   ];
 
   for (let i = 0; i < dustCount; i++) {
@@ -5105,13 +5111,12 @@ const initThreeScene = () => {
   const galacticColors = new Float32Array(galacticCount * 3);
 
   const galacticPalette = [
-    new THREE.Color(0xec4899), // magenta stardust
-    new THREE.Color(0xa855f7), // purple nebula
     new THREE.Color(0x00f0ff), // cyan cosmic ray
     new THREE.Color(0x38bdf8), // azure starlight
     new THREE.Color(0xffd166), // golden core dust
     new THREE.Color(0xffffff), // brilliant star
-    new THREE.Color(0x818cf8), // periwinkle
+    new THREE.Color(0xe0f2fe), // ice blue
+    new THREE.Color(0xdbeafe), // pale starlight
   ];
 
   const galAngle = Math.PI * 0.22;
@@ -5252,7 +5257,9 @@ const initThreeScene = () => {
     const nebSprite = new THREE.Sprite(nebMat);
     nebSprite.position.set(neb.pos[0], neb.pos[1], neb.pos[2]);
     nebSprite.scale.set(neb.scale, neb.scale, 1);
+    nebSprite.userData = { baseOpacity: neb.opacity };
     scene.add(nebSprite);
+    solarNebulaSprites.push(nebSprite);
   }
 
   // 5D. Globular Star Clusters (Omega Centauri & Pleiades)
@@ -5754,6 +5761,29 @@ const initThreeScene = () => {
    ANIMATION & RENDER LOOP
    ========================================================= */
 
+const isGalaxyObject = (bodyId: string | null | undefined): boolean => {
+  if (!bodyId) return false;
+  if (bodyId === 'galactic-core') return true;
+  if (
+    bodyId === 'easter-teapot' ||
+    bodyId === 'easter-dont-panic' ||
+    bodyId === 'easter-rubber-duck' ||
+    bodyId === 'easter-rubiks' ||
+    bodyId === 'easter-invader' ||
+    bodyId === 'easter-delorean' ||
+    bodyId === 'easter-gameboy' ||
+    bodyId === 'easter-ramen' ||
+    bodyId === 'easter-floppy'
+  ) {
+    return true;
+  }
+  return Boolean(
+    galaxySystem?.interactiveMeshes.some(
+      (m) => m.name === bodyId || (m.userData && m.userData.body && m.userData.body.id === bodyId),
+    ),
+  );
+};
+
 const renderLoop = (timestamp: number) => {
   if (lastTimestamp === 0) lastTimestamp = timestamp;
   const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
@@ -5763,9 +5793,45 @@ const renderLoop = (timestamp: number) => {
     simulationTime += dt;
   }
 
-  // A0. Constellation Network Subtle Stellar Pulse
+  // Distance LOD measurement from the cosmic origin (0, 0, 0)
+  const cosmicDist = camera ? camera.position.length() : 0;
+  const isGalaxyFocus =
+    isGalaxyObject(activeTrackingId) || isGalaxyObject(props.selectedBodyId);
+  // When actively focusing on galaxy core or galactic easter eggs, galaxy is ALWAYS at full brilliance (>= 15000)
+  const galaxyLODDist = isGalaxyFocus ? 26000 : cosmicDist;
+
+  // A0. Constellation Network Subtle Stellar Pulse & Zoom Distance LOD (Hidden in galaxy view)
   if (constellationSystem) {
-    constellationSystem.update(simulationTime);
+    constellationSystem.update(simulationTime, isGalaxyFocus ? 10000 : cosmicDist);
+  }
+
+  // A0-Galaxy. 3D Spiral Galaxy Dynamic Rotation & Distance LOD
+  if (galaxySystem && camera) {
+    const normMouse =
+      mouseVector && mouseVector.x > -500 ? { x: mouseVector.x, y: mouseVector.y } : undefined;
+    galaxySystem.update(galaxyLODDist, dt, simulationTime, normMouse);
+  }
+
+  // Smooth Distance LOD: Fade out solar system cosmic dust, old stardust river, starfield & nebulae on zoom out (D = 2800 -> 5200)
+  const solarFade = isGalaxyFocus ? 0 : Math.max(0, Math.min(1.0, 1.0 - (cosmicDist - 2800) / 2400));
+  const isSolarActive = solarFade > 0.005;
+
+  if (cosmicDustPoints) {
+    cosmicDustPoints.visible = isSolarActive;
+    (cosmicDustPoints.material as THREE.PointsMaterial).opacity = 0.96 * solarFade;
+  }
+  if (galacticStreamPoints) {
+    galacticStreamPoints.visible = isSolarActive;
+    (galacticStreamPoints.material as THREE.PointsMaterial).opacity = 0.92 * solarFade;
+  }
+  if (starFieldPoints) {
+    starFieldPoints.visible = isSolarActive;
+    (starFieldPoints.material as THREE.PointsMaterial).opacity = 0.98 * solarFade;
+  }
+  for (let n = 0; n < solarNebulaSprites.length; n++) {
+    const neb = solarNebulaSprites[n];
+    neb.visible = isSolarActive;
+    neb.material.opacity = ((neb.userData.baseOpacity as number) || 0.4) * solarFade;
   }
 
   // A. Sun Animation
@@ -6611,6 +6677,17 @@ const getBodyCurrentPosition = (
   if (bodyId === coffeeBody.id && coffeeGroup) return out.copy(coffeeGroup.position);
   if (bodyId === guitarBody.id && guitarGroup) return out.copy(guitarGroup.position);
   if (bodyId === nekoBody.id && nekoGroup) return out.copy(nekoGroup.position);
+  if (bodyId === 'galactic-core') return out.set(0, 0, 0);
+
+  // Dynamic galaxy interactive mesh lookup (e.g. Galactic Easter Eggs)
+  const gMesh = galaxySystem?.interactiveMeshes.find(
+    (m) => m.name === bodyId || (m.userData && m.userData.body && m.userData.body.id === bodyId),
+  );
+  if (gMesh) {
+    gMesh.updateWorldMatrix(true, false);
+    gMesh.getWorldPosition(out);
+    return out;
+  }
 
   return null;
 };
@@ -6631,6 +6708,36 @@ const getBodyCameraOffset = (bodyId: string): THREE.Vector3 => {
 
   let base: THREE.Vector3;
   switch (bodyId) {
+    case 'galactic-core':
+      base = new THREE.Vector3(0, 15000, 22000);
+      break;
+    case 'easter-teapot':
+      base = new THREE.Vector3(750, 480, 950);
+      break;
+    case 'easter-dont-panic':
+      base = new THREE.Vector3(850, 520, 1100);
+      break;
+    case 'easter-rubber-duck':
+      base = new THREE.Vector3(800, 500, 1000);
+      break;
+    case 'easter-rubiks':
+      base = new THREE.Vector3(780, 480, 960);
+      break;
+    case 'easter-invader':
+      base = new THREE.Vector3(850, 500, 1050);
+      break;
+    case 'easter-delorean':
+      base = new THREE.Vector3(820, 480, 1050);
+      break;
+    case 'easter-gameboy':
+      base = new THREE.Vector3(750, 450, 950);
+      break;
+    case 'easter-ramen':
+      base = new THREE.Vector3(760, 480, 960);
+      break;
+    case 'easter-floppy':
+      base = new THREE.Vector3(720, 420, 900);
+      break;
     case 'comet-halley':
       base = new THREE.Vector3(120, 60, 130);
       break;
@@ -6789,9 +6896,19 @@ const focusOnBody = (bodyId: string | null) => {
 };
 
 const resetView = () => {
+  const wasInGalaxy =
+    (camera && camera.position.length() > 5500) ||
+    isGalaxyObject(activeTrackingId) ||
+    isGalaxyObject(props.selectedBodyId);
+
   activeTrackingId = null;
-  cameraTargetPos.set(0, 320, 520);
-  controlsTargetPos.set(0, 0, 0);
+  if (wasInGalaxy) {
+    cameraTargetPos.set(0, 15000, 22000);
+    controlsTargetPos.set(0, 0, 0);
+  } else {
+    cameraTargetPos.set(0, 320, 520);
+    controlsTargetPos.set(0, 0, 0);
+  }
   flyToStartCam.copy(camera.position);
   flyToStartTarget.copy(controls.target);
   flyToStartTime = performance.now();
@@ -6802,14 +6919,18 @@ const zoomIn = () => {
   isCameraAnimating = false;
   const dir = new THREE.Vector3();
   camera.getWorldDirection(dir);
-  camera.position.addScaledVector(dir, 80);
+  const dist = camera.position.distanceTo(controls ? controls.target : new THREE.Vector3(0, 0, 0));
+  const step = Math.max(80, dist * 0.22);
+  camera.position.addScaledVector(dir, step);
 };
 
 const zoomOut = () => {
   isCameraAnimating = false;
   const dir = new THREE.Vector3();
   camera.getWorldDirection(dir);
-  camera.position.addScaledVector(dir, -80);
+  const dist = camera.position.distanceTo(controls ? controls.target : new THREE.Vector3(0, 0, 0));
+  const step = Math.max(80, dist * 0.25);
+  camera.position.addScaledVector(dir, -step);
 };
 
 defineExpose({
@@ -6879,6 +7000,18 @@ const getIntersectedBody = (clientX: number, clientY: number): CelestialBody | n
   for (const p of planets3D) {
     targets.push(p.mesh);
   }
+  if (galaxySystem) {
+    const camDist = camera
+      ? camera.position.distanceTo(controls ? controls.target : new THREE.Vector3(0, 0, 0))
+      : 0;
+    // Only check galaxy interactive meshes when galaxy is actually visible in galaxy view (camDist >= 5200)
+    // When inside the solar system, empty clicks must NEVER trigger the galaxy!
+    if (camDist >= 5200) {
+      for (const m of galaxySystem.interactiveMeshes) {
+        targets.push(m);
+      }
+    }
+  }
 
   const intersects = raycaster.intersectObjects(targets, false);
   if (intersects.length > 0) {
@@ -6891,6 +7024,8 @@ const triggerSelect = (body: CelestialBody) => {
   const now = Date.now();
   if (now - lastSelectTime < 350) return;
   lastSelectTime = now;
+
+  focusOnBody(body.id);
   emit('select', body);
 };
 
@@ -6899,8 +7034,25 @@ const triggerUnselect = () => {
   if (now - lastSelectTime < 250) return;
   lastSelectTime = now;
   hoveredBody.value = null;
+
+  const wasInGalaxy =
+    (camera && camera.position.length() > 5500) ||
+    isGalaxyObject(activeTrackingId) ||
+    isGalaxyObject(props.selectedBodyId);
+
   emit('select', null);
   emit('unselect');
+
+  // When clicking anywhere on empty space from a galaxy object, center smoothly to the whole galaxy!
+  if (wasInGalaxy) {
+    activeTrackingId = null;
+    cameraTargetPos.set(0, 15000, 22000);
+    controlsTargetPos.set(0, 0, 0);
+    flyToStartCam.copy(camera.position);
+    flyToStartTarget.copy(controls.target);
+    flyToStartTime = performance.now();
+    isCameraAnimating = true;
+  }
 };
 
 const onPointerDown = (e: PointerEvent) => {
@@ -6989,13 +7141,28 @@ onUnmounted(() => {
   controls?.dispose();
   renderer?.dispose();
   constellationSystem?.dispose();
+  galaxySystem?.dispose();
 });
 
 watch(
   () => props.selectedBodyId,
-  (newId) => {
+  (newId, oldId) => {
     if (newId) {
       focusOnBody(newId);
+    } else {
+      const wasInGalaxy =
+        isGalaxyObject(oldId) ||
+        isGalaxyObject(activeTrackingId) ||
+        (camera && camera.position.length() > 5500);
+      if (wasInGalaxy) {
+        activeTrackingId = null;
+        cameraTargetPos.set(0, 15000, 22000);
+        controlsTargetPos.set(0, 0, 0);
+        flyToStartCam.copy(camera.position);
+        flyToStartTarget.copy(controls.target);
+        flyToStartTime = performance.now();
+        isCameraAnimating = true;
+      }
     }
   },
 );

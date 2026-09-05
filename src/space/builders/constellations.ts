@@ -593,7 +593,7 @@ export interface ConstellationSystem {
   linesMesh: THREE.LineSegments;
   starsPoints: THREE.Points;
   flaresGroup: THREE.Group;
-  update: (simulationTime: number) => void;
+  update: (simulationTime: number, cameraDistance?: number) => void;
   dispose: () => void;
 }
 
@@ -860,19 +860,37 @@ export function buildConstellationSystem(
   const starsPoints = new THREE.Points(starGeo, starMat);
   starsPoints.renderOrder = 1;
 
-  // Animation updater for sparkling starlight breathing & scintillation
-  const update = (simulationTime: number) => {
+  // Animation updater for sparkling starlight breathing & distance LOD fade
+  const update = (simulationTime: number, cameraDistance?: number) => {
+    // Distance LOD: Constellations fade out smoothly when zooming out past outer solar system (D = 2800 -> 5200)
+    let fadeFactor = 1.0;
+    if (cameraDistance !== undefined) {
+      if (cameraDistance >= 5200) {
+        fadeFactor = 0.0;
+      } else if (cameraDistance > 2800) {
+        fadeFactor = 1.0 - (cameraDistance - 2800) / 2400;
+      }
+    }
+
+    const isVisible = fadeFactor > 0.001;
+    linesMesh.visible = isVisible;
+    starsPoints.visible = isVisible;
+    flaresGroup.visible = isVisible;
+
+    if (!isVisible) return;
+
     // Subtle line breathing
-    const linePulse = 0.74 + Math.sin(simulationTime * 1.5) * 0.08;
+    const linePulse = (0.74 + Math.sin(simulationTime * 1.5) * 0.08) * fadeFactor;
     lineMat.opacity = linePulse;
 
     // Twinkling stars
-    const starPulse = 0.94 + Math.sin(simulationTime * 2.2) * 0.06;
+    const starPulse = (0.94 + Math.sin(simulationTime * 2.2) * 0.06) * fadeFactor;
     starMat.opacity = starPulse;
 
     // Scintillation on Alpha star flares
     for (const f of flareSprites) {
-      f.sprite.material.opacity = f.baseOpacity * (0.88 + Math.sin(simulationTime * 2.6 + f.phase) * 0.12);
+      f.sprite.material.opacity =
+        f.baseOpacity * (0.88 + Math.sin(simulationTime * 2.6 + f.phase) * 0.12) * fadeFactor;
     }
   };
 
