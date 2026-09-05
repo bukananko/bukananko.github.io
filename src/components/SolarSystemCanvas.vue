@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { type CelestialBody, solarSystemBodies } from '@/constant';
 import { buildConstellationSystem, type ConstellationSystem } from '@/space/builders/constellations';
 import { buildGalaxySystem, type GalaxySystem } from '@/space/builders/galaxy';
+import { RocketGameManager, type RocketGameState } from '@/space/systems/rocketGame';
 
 const props = withDefaults(
   defineProps<{
@@ -23,7 +24,16 @@ const emit = defineEmits<{
   (e: 'select', body: CelestialBody | null): void;
   (e: 'hover', body: CelestialBody | null): void;
   (e: 'unselect'): void;
+  (e: 'rocket-state', state: RocketGameState): void;
+  (e: 'rocket-exit'): void;
 }>();
+
+// Rocket Game Flight Exploration Mode
+const isRocketActive = ref(false);
+const isRocketInspecting = ref(false);
+let rocketGame: RocketGameManager | null = null;
+let isRocketDragging = false;
+let lastRocketDragPos = { x: 0, y: 0 };
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -32,6 +42,11 @@ const canvasRef = ref<HTMLCanvasElement | null>(null);
 const hoveredBody = ref<CelestialBody | null>(null);
 const isDragging = ref(false);
 const tooltipPos = ref({ x: -1000, y: -1000 });
+
+// Detail View detection (telemetry panel open, body selected, or object inspection)
+const isDetailView = computed(() =>
+  Boolean(props.selectedBodyId || props.isPanelOpen || isRocketInspecting.value || activeTrackingId),
+);
 
 // Three.js Core
 let scene: THREE.Scene;
@@ -6539,84 +6554,150 @@ const renderLoop = (timestamp: number) => {
     galacticStreamPoints.rotation.y += dt * 0.012;
   }
 
-  // 1. Smooth Viewport Asymmetric Framing (Desktop left, Mobile top)
-  // Uses Three.js camera.setViewOffset so controls.target stays 100% on the object itself!
-  // This completely eliminates any centrifugal / gyroscopic spinning when dragging to inspect!
-  const containerW = containerRef.value ? containerRef.value.clientWidth : window.innerWidth;
-  const containerH = containerRef.value ? containerRef.value.clientHeight : window.innerHeight;
-  const isMobile = containerW < 768;
-
-  let targetViewOffsetX = 0;
-  let targetViewOffsetY = 0;
-
-  if (props.isPanelOpen && activeTrackingId) {
-    if (isMobile) {
-      // Mobile: bottom sheet open -> shift view window downwards so object appears in top open area
-      targetViewOffsetY = containerH * 0.28;
-    } else {
-      // Desktop: right drawer open -> shift view window to the right so object appears in left open area
-      const drawerW = Math.min(540, containerW * 0.34);
-      targetViewOffsetX = drawerW * 0.5;
+  // If Rocket Exploration Flight Mode is active:
+  if (isRocketActive.value && rocketGame) {
+    if (camera.view && camera.view.enabled) {
+      camera.clearViewOffset();
     }
-  }
 
-  currentViewOffsetX += (targetViewOffsetX - currentViewOffsetX) * 0.08;
-  currentViewOffsetY += (targetViewOffsetY - currentViewOffsetY) * 0.08;
+    if (isRocketInspecting.value) {
+      // Spacecraft holds stationary in space while user inspects the object
+      rocketGame.pauseFlight();
 
-  if (Math.abs(currentViewOffsetX) > 0.4 || Math.abs(currentViewOffsetY) > 0.4) {
-    camera.setViewOffset(
-      containerW,
-      containerH,
-      currentViewOffsetX,
-      currentViewOffsetY,
-      containerW,
-      containerH,
-    );
-  } else if (camera.view && camera.view.enabled) {
-    camera.clearViewOffset();
-  }
+      // Camera Fly-To & Tracking for inspected celestial body
+      if (activeTrackingId) {
+        const livePos = getBodyCurrentPosition(activeTrackingId);
+        if (livePos) {
+          if (isCameraAnimating) {
+            const elapsed = performance.now() - flyToStartTime;
+            const progress = Math.min(1, elapsed / flyToDuration);
+            const ease = 1 - Math.pow(1 - progress, 3); // Smooth cubic ease-out
 
-  // 2. Camera Fly-To Smooth Animation & Real-Time Dynamic Object Tracking
-  if (activeTrackingId) {
-    const livePos = getBodyCurrentPosition(activeTrackingId);
-    if (livePos) {
-      if (isCameraAnimating) {
+            const currentTargetCam = livePos.clone().add(trackingCamOffset);
+            camera.position.lerpVectors(flyToStartCam, currentTargetCam, ease);
+            controls.target.lerpVectors(flyToStartTarget, livePos, ease);
+
+            if (progress >= 1) {
+              isCameraAnimating = false;
+            }
+          } else {
+            // Continuous Real-Time Motion Tracking
+            const bodyDelta = livePos.clone().sub(lastTrackedBodyPos);
+            controls.target.add(bodyDelta);
+            camera.position.add(bodyDelta);
+          }
+          lastTrackedBodyPos.copy(livePos);
+        }
+      } else if (isCameraAnimating) {
+        // Returning from inspected object back to the rocket!
         const elapsed = performance.now() - flyToStartTime;
         const progress = Math.min(1, elapsed / flyToDuration);
-        const ease = 1 - Math.pow(1 - progress, 3); // Smooth cubic ease-out
+        const ease = 1 - Math.pow(1 - progress, 3);
 
-        const currentTargetCam = livePos.clone().add(trackingCamOffset);
-        camera.position.lerpVectors(flyToStartCam, currentTargetCam, ease);
-        controls.target.lerpVectors(flyToStartTarget, livePos, ease);
+        camera.position.lerpVectors(flyToStartCam, cameraTargetPos, ease);
+        controls.target.lerpVectors(flyToStartTarget, controlsTargetPos, ease);
 
         if (progress >= 1) {
           isCameraAnimating = false;
+          isRocketInspecting.value = false;
+          controls.enabled = false;
         }
       } else {
-        // Continuous Real-Time Motion Tracking: follow object's orbital / flight velocity
-        // Moves BOTH target and camera by the exact same delta vector.
-        // This guarantees the object stays locked in view while user's custom zoom distance & drag angle are 100% preserved!
-        const bodyDelta = livePos.clone().sub(lastTrackedBodyPos);
-        controls.target.add(bodyDelta);
-        camera.position.add(bodyDelta);
+        // Ensure inspecting state is cleared if not tracking and not animating
+        isRocketInspecting.value = false;
+        controls.enabled = false;
       }
 
-      lastTrackedBodyPos.copy(livePos);
+      controls.update();
+    } else {
+      // Active rocket piloting mode:
+      // Auto-center camera when any flight input is active!
+      if (rocketGame.isFlightInputActive) {
+        rocketGame.recenterMouseLook(dt);
+      }
+      rocketGame.update(dt);
     }
-  } else if (isCameraAnimating) {
-    const elapsed = performance.now() - flyToStartTime;
-    const progress = Math.min(1, elapsed / flyToDuration);
-    const ease = 1 - Math.pow(1 - progress, 3);
+  } else {
+    // 1. Smooth Viewport Asymmetric Framing (Desktop left, Mobile top)
+    // Uses Three.js camera.setViewOffset so controls.target stays 100% on the object itself!
+    // This completely eliminates any centrifugal / gyroscopic spinning when dragging to inspect!
+    const containerW = containerRef.value ? containerRef.value.clientWidth : window.innerWidth;
+    const containerH = containerRef.value ? containerRef.value.clientHeight : window.innerHeight;
+    const isMobile = containerW < 768;
 
-    camera.position.lerpVectors(flyToStartCam, cameraTargetPos, ease);
-    controls.target.lerpVectors(flyToStartTarget, controlsTargetPos, ease);
+    let targetViewOffsetX = 0;
+    let targetViewOffsetY = 0;
 
-    if (progress >= 1) {
-      isCameraAnimating = false;
+    if (props.isPanelOpen && activeTrackingId) {
+      if (isMobile) {
+        // Mobile: bottom sheet open -> shift view window downwards so object appears in top open area
+        targetViewOffsetY = containerH * 0.28;
+      } else {
+        // Desktop: right drawer open -> shift view window to the right so object appears in left open area
+        const drawerW = Math.min(540, containerW * 0.34);
+        targetViewOffsetX = drawerW * 0.5;
+      }
     }
+
+    currentViewOffsetX += (targetViewOffsetX - currentViewOffsetX) * 0.08;
+    currentViewOffsetY += (targetViewOffsetY - currentViewOffsetY) * 0.08;
+
+    if (Math.abs(currentViewOffsetX) > 0.4 || Math.abs(currentViewOffsetY) > 0.4) {
+      camera.setViewOffset(
+        containerW,
+        containerH,
+        currentViewOffsetX,
+        currentViewOffsetY,
+        containerW,
+        containerH,
+      );
+    } else if (camera.view && camera.view.enabled) {
+      camera.clearViewOffset();
+    }
+
+    // 2. Camera Fly-To Smooth Animation & Real-Time Dynamic Object Tracking
+    if (activeTrackingId) {
+      const livePos = getBodyCurrentPosition(activeTrackingId);
+      if (livePos) {
+        if (isCameraAnimating) {
+          const elapsed = performance.now() - flyToStartTime;
+          const progress = Math.min(1, elapsed / flyToDuration);
+          const ease = 1 - Math.pow(1 - progress, 3); // Smooth cubic ease-out
+
+          const currentTargetCam = livePos.clone().add(trackingCamOffset);
+          camera.position.lerpVectors(flyToStartCam, currentTargetCam, ease);
+          controls.target.lerpVectors(flyToStartTarget, livePos, ease);
+
+          if (progress >= 1) {
+            isCameraAnimating = false;
+          }
+        } else {
+          // Continuous Real-Time Motion Tracking: follow object's orbital / flight velocity
+          // Moves BOTH target and camera by the exact same delta vector.
+          // This guarantees the object stays locked in view while user's custom zoom distance & drag angle are 100% preserved!
+          const bodyDelta = livePos.clone().sub(lastTrackedBodyPos);
+          controls.target.add(bodyDelta);
+          camera.position.add(bodyDelta);
+        }
+
+        lastTrackedBodyPos.copy(livePos);
+      }
+    } else if (isCameraAnimating) {
+      const elapsed = performance.now() - flyToStartTime;
+      const progress = Math.min(1, elapsed / flyToDuration);
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      camera.position.lerpVectors(flyToStartCam, cameraTargetPos, ease);
+      controls.target.lerpVectors(flyToStartTarget, controlsTargetPos, ease);
+
+      if (progress >= 1) {
+        isCameraAnimating = false;
+      }
+    }
+
+    controls.update();
   }
 
-  controls.update();
   renderer.render(scene, camera);
 
   animationFrameId = requestAnimationFrame(renderLoop);
@@ -6896,6 +6977,11 @@ const focusOnBody = (bodyId: string | null) => {
 };
 
 const resetView = () => {
+  if (isRocketActive.value) {
+    returnToRocket();
+    return;
+  }
+
   const wasInGalaxy =
     (camera && camera.position.length() > 5500) ||
     isGalaxyObject(activeTrackingId) ||
@@ -6933,11 +7019,96 @@ const zoomOut = () => {
   camera.position.addScaledVector(dir, -step);
 };
 
+/* =========================================================
+   ROCKET EXPLORATION FLIGHT MODE METHODS (DESKTOP ONLY)
+   ========================================================= */
+
+const startRocketMode = () => {
+  if (!rocketGame) return;
+  // Desktop only check
+  if (window.innerWidth < 768) return;
+
+  isRocketActive.value = true;
+  isRocketInspecting.value = false;
+  controls.enabled = false;
+  hoveredBody.value = null;
+  activeTrackingId = null;
+  isCameraAnimating = false;
+
+  // Spawn spacecraft smoothly in front of current camera
+  const spawnPos = camera.position
+    .clone()
+    .addScaledVector(camera.getWorldDirection(new THREE.Vector3()), 140);
+  rocketGame.start(spawnPos);
+};
+
+const stopRocketMode = () => {
+  if (!rocketGame) return;
+  isRocketActive.value = false;
+  isRocketInspecting.value = false;
+  rocketGame.stop();
+  controls.enabled = true;
+  camera.fov = 50;
+  camera.updateProjectionMatrix();
+
+  // Auto-recenter camera: to Sun if in Solar System (<= 5500), or Galaxy if in Galaxy (> 5500)
+  const distFromCenter = rocketGame.position.length();
+  const isInGalaxy = distFromCenter > 5500;
+  activeTrackingId = null;
+
+  if (isInGalaxy) {
+    cameraTargetPos.set(0, 15000, 22000);
+    controlsTargetPos.set(0, 0, 0);
+  } else {
+    cameraTargetPos.set(0, 320, 520);
+    controlsTargetPos.set(0, 0, 0);
+  }
+  flyToStartCam.copy(camera.position);
+  flyToStartTarget.copy(controls.target);
+  flyToStartTime = performance.now();
+  isCameraAnimating = true;
+};
+
+const toggleRocketMode = () => {
+  if (isRocketActive.value) {
+    stopRocketMode();
+    emit('rocket-exit');
+  } else {
+    startRocketMode();
+  }
+};
+
+const returnToRocket = () => {
+  if (!isRocketActive.value || !rocketGame) return;
+  activeTrackingId = null;
+  controls.enabled = false;
+  isRocketInspecting.value = true;
+
+  // Smoothly fly camera back to rocket chase position
+  const targetCamPos = rocketGame.getIdealCameraPosition();
+  cameraTargetPos.copy(targetCamPos);
+  controlsTargetPos.copy(rocketGame.position);
+  flyToStartCam.copy(camera.position);
+  flyToStartTarget.copy(controls.target);
+  flyToStartTime = performance.now();
+  isCameraAnimating = true;
+};
+
+const toggleRocketMute = () => {
+  return rocketGame?.toggleMute() ?? false;
+};
+
 defineExpose({
   resetView,
   focusOnBody,
   zoomIn,
   zoomOut,
+  startRocketMode,
+  stopRocketMode,
+  toggleRocketMode,
+  returnToRocket,
+  toggleRocketMute,
+  isRocketActive,
 });
 
 /* =========================================================
@@ -7001,12 +7172,16 @@ const getIntersectedBody = (clientX: number, clientY: number): CelestialBody | n
     targets.push(p.mesh);
   }
   if (galaxySystem) {
-    const camDist = camera
-      ? camera.position.distanceTo(controls ? controls.target : new THREE.Vector3(0, 0, 0))
-      : 0;
-    // Only check galaxy interactive meshes when galaxy is actually visible in galaxy view (camDist >= 5200)
-    // When inside the solar system, empty clicks must NEVER trigger the galaxy!
-    if (camDist >= 5200) {
+    const camDistFromCenter = camera ? camera.position.length() : 0;
+    const rocketDistFromCenter =
+      isRocketActive.value && rocketGame ? rocketGame.position.length() : 0;
+    // In rocket mode or galaxy view: if camera or rocket is in the galaxy realm, target all galaxy objects!
+    const isGalaxyRealm =
+      camDistFromCenter >= 3200 ||
+      rocketDistFromCenter >= 2400 ||
+      (isRocketActive.value && isRocketInspecting.value);
+
+    if (isGalaxyRealm) {
       for (const m of galaxySystem.interactiveMeshes) {
         targets.push(m);
       }
@@ -7025,6 +7200,8 @@ const triggerSelect = (body: CelestialBody) => {
   if (now - lastSelectTime < 350) return;
   lastSelectTime = now;
 
+  hoveredBody.value = null;
+  emit('hover', null);
   focusOnBody(body.id);
   emit('select', body);
 };
@@ -7034,6 +7211,13 @@ const triggerUnselect = () => {
   if (now - lastSelectTime < 250) return;
   lastSelectTime = now;
   hoveredBody.value = null;
+
+  if (isRocketActive.value) {
+    returnToRocket();
+    emit('select', null);
+    emit('unselect');
+    return;
+  }
 
   const wasInGalaxy =
     (camera && camera.position.length() > 5500) ||
@@ -7056,6 +7240,22 @@ const triggerUnselect = () => {
 };
 
 const onPointerDown = (e: PointerEvent) => {
+  if (isRocketActive.value) {
+    pointerDownPos = { x: e.clientX, y: e.clientY };
+    pointerDownTime = Date.now();
+
+    if (isRocketInspecting.value && activeTrackingId) {
+      isPointerDown = true;
+      isDragging.value = false;
+      isCameraAnimating = false;
+      return;
+    }
+
+    // Free flight rocket mode: mouse drag orbits chase camera around the spacecraft
+    isRocketDragging = true;
+    lastRocketDragPos = { x: e.clientX, y: e.clientY };
+    return;
+  }
   isPointerDown = true;
   pointerDownPos = { x: e.clientX, y: e.clientY };
   pointerDownTime = Date.now();
@@ -7065,6 +7265,42 @@ const onPointerDown = (e: PointerEvent) => {
 };
 
 const onPointerMove = (e: PointerEvent) => {
+  // If in detail view (modal is open, body is selected, or inspecting in rocket mode),
+  // suppress hover tooltip and raycast processing completely!
+  if (isDetailView.value) {
+    if (hoveredBody.value) {
+      hoveredBody.value = null;
+      emit('hover', null);
+    }
+    if (isRocketActive.value && isRocketDragging && rocketGame) {
+      const dx = e.clientX - lastRocketDragPos.x;
+      const dy = e.clientY - lastRocketDragPos.y;
+      rocketGame.applyMouseLook(dx, dy);
+      lastRocketDragPos = { x: e.clientX, y: e.clientY };
+    }
+    return;
+  }
+
+  if (isRocketActive.value) {
+    // 1. If user is actively dragging/orbiting the camera around the craft:
+    if (isRocketDragging && rocketGame) {
+      hoveredBody.value = null;
+      const dx = e.clientX - lastRocketDragPos.x;
+      const dy = e.clientY - lastRocketDragPos.y;
+      rocketGame.applyMouseLook(dx, dy);
+      lastRocketDragPos = { x: e.clientX, y: e.clientY };
+      return;
+    }
+
+    // 2. When flying without dragging: track mouse hover & show HUD tooltip badge!
+    tooltipPos.value = { x: e.clientX, y: e.clientY };
+    const hit = getIntersectedBody(e.clientX, e.clientY);
+    if (hoveredBody.value?.id !== hit?.id) {
+      hoveredBody.value = hit;
+      emit('hover', hit);
+    }
+    return;
+  }
   tooltipPos.value = { x: e.clientX, y: e.clientY };
 
   if (isPointerDown) {
@@ -7083,6 +7319,30 @@ const onPointerMove = (e: PointerEvent) => {
 };
 
 const onPointerUp = (e: PointerEvent) => {
+  if (isRocketActive.value) {
+    isRocketDragging = false;
+    const distMoved = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+    const timeElapsed = Date.now() - pointerDownTime;
+
+    // Short click/tap on interactive body
+    if (distMoved < 14 && timeElapsed < 500) {
+      const hit = getIntersectedBody(e.clientX, e.clientY);
+      if (hit) {
+        // Inspect object without leaving rocket mode!
+        isRocketInspecting.value = true;
+        controls.enabled = true;
+        rocketGame?.pauseFlight();
+        triggerSelect(hit);
+        return;
+      } else if (isRocketInspecting.value) {
+        // Clicked empty space while inspecting -> return to rocket
+        returnToRocket();
+        emit('unselect');
+        return;
+      }
+    }
+    return;
+  }
   const distMoved = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
   const timeElapsed = Date.now() - pointerDownTime;
 
@@ -7101,6 +7361,8 @@ const onPointerUp = (e: PointerEvent) => {
 };
 
 const onPointerLeave = () => {
+  isRocketDragging = false;
+  if (isRocketActive.value && !isRocketInspecting.value) return;
   isPointerDown = false;
   hoveredBody.value = null;
   isDragging.value = false;
@@ -7130,12 +7392,30 @@ onMounted(() => {
   window.addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', onVisibilityChange);
   animationFrameId = requestAnimationFrame(renderLoop);
+
+  // Initialize Rocket Game Flight Manager
+  rocketGame = new RocketGameManager(scene, camera);
+  rocketGame.onStateUpdate = (st) => {
+    emit('rocket-state', st);
+  };
+  rocketGame.onExitRequested = () => {
+    if (isRocketInspecting.value) {
+      returnToRocket();
+      emit('unselect');
+    } else {
+      stopRocketMode();
+      emit('rocket-exit');
+    }
+  };
 });
 
 onUnmounted(() => {
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
   window.removeEventListener('resize', onResize);
   document.removeEventListener('visibilitychange', onVisibilityChange);
+
+  // Clean up Rocket Game resources
+  rocketGame?.dispose();
 
   // Clean up Three.js memory
   controls?.dispose();
@@ -7148,8 +7428,16 @@ watch(
   () => props.selectedBodyId,
   (newId, oldId) => {
     if (newId) {
+      hoveredBody.value = null;
+      emit('hover', null);
       focusOnBody(newId);
     } else {
+      // In Rocket Exploration Mode: ALWAYS return directly to the spaceship, NEVER fly to galaxy!
+      if (isRocketActive.value) {
+        returnToRocket();
+        return;
+      }
+
       const wasInGalaxy =
         isGalaxyObject(oldId) ||
         isGalaxyObject(activeTrackingId) ||
@@ -7172,7 +7460,7 @@ watch(
   <div
     ref="containerRef"
     class="relative w-full h-full overflow-hidden select-none bg-[#02040a] touch-none"
-    :class="[isDragging ? 'cursor-grabbing' : hoveredBody ? '!cursor-pointer' : 'cursor-grab']"
+    :class="[isDragging ? 'cursor-grabbing' : (hoveredBody && !isDetailView) ? '!cursor-pointer' : 'cursor-grab']"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
@@ -7180,12 +7468,12 @@ watch(
     <canvas
       ref="canvasRef"
       class="block w-full h-full touch-none"
-      :class="hoveredBody ? '!cursor-pointer' : ''" />
+      :class="(hoveredBody && !isDetailView) ? '!cursor-pointer' : ''" />
 
-    <!-- Planet Hover HUD Title Badge (Appears when hovering on any planet or Sun) -->
+    <!-- Planet Hover HUD Title Badge (Appears when hovering on any planet or Sun, hidden in detail view) -->
     <transition name="fade">
       <div
-        v-if="hoveredBody"
+        v-if="hoveredBody && !isDetailView"
         class="pointer-events-none fixed z-40 transform -translate-x-1/2 -translate-y-full px-3.5 py-2 rounded-xl backdrop-blur-md border shadow-2xl transition-all duration-75 bg-[#020614]/90 text-white"
         :style="{
           left: `${tooltipPos.x}px`,

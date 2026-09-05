@@ -10,6 +10,7 @@ const emit = defineEmits<{
   (e: 'toggle-speed'): void;
   (e: 'zoom-in'): void;
   (e: 'zoom-out'): void;
+  (e: 'toggle-rocket'): void;
 }>();
 </script>
 
@@ -17,9 +18,20 @@ const emit = defineEmits<{
   <aside
     aria-label="Mission Control HUD"
     class="fixed bottom-5 left-0 right-0 z-40 px-4 pointer-events-none flex justify-center">
-    <!-- Flight Telemetry Sub Controls: Orbit Speed, Recenter, Zoom -->
+    <!-- Flight Telemetry Sub Controls: Orbit Speed, Recenter, Zoom, Rocket Mode -->
     <div
       class="pointer-events-auto flex items-center gap-2.5 text-xs font-mono p-1.5 rounded-2xl cosmic-glass border border-white/10 shadow-2xl backdrop-blur-xl">
+      <!-- Rocket Exploration Mode (Desktop Only) -->
+      <button
+        @click="emit('toggle-rocket')"
+        class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/25 text-sky-300 transition-all shadow-sm border border-sky-400/30"
+        title="Mode Pesawat Antariksa [R] (Eksplorasi)">
+        <Icon icon="solar:rocket-2-bold" width="16" class="text-sky-400" />
+        <span>Eksplor [R]</span>
+      </button>
+
+      <span class="hidden md:inline text-white/15">|</span>
+
       <!-- Speed Multiplier -->
       <button
         @click="emit('toggle-speed')"
