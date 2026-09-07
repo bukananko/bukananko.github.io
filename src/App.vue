@@ -5,6 +5,7 @@ import SolarSystemCanvas from './components/SolarSystemCanvas.vue';
 import TelemetryModal from './components/TelemetryModal.vue';
 import MissionControlHUD from './components/MissionControlHUD.vue';
 import RocketGameHUD from './components/RocketGameHUD.vue';
+import LoadingScreen from './components/LoadingScreen.vue';
 import { type CelestialBody, solarSystemBodies } from './constant';
 import type { RocketGameState } from './space/systems/rocketGame';
 
@@ -13,12 +14,30 @@ const selectedBody = ref<CelestialBody | null>(null);
 const isModalOpen = ref(false);
 const orbitSpeedMultiplier = ref(1);
 
+// Initial Loading Screen State
+const isLoading = ref(true);
+const loadingProgress = ref(15);
+const loadingMessage = ref('Menginisialisasi Engine Tiga Dimensi & Kamera...');
+
+const onLoadProgress = (data: { progress: number; message: string }) => {
+  loadingProgress.value = data.progress;
+  loadingMessage.value = data.message;
+};
+
+const onCanvasLoaded = () => {
+  loadingProgress.value = 100;
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 450);
+};
+
 // Rocket Flight Exploration Game State (Desktop Only)
 const isRocketMode = ref(false);
 const rocketState = ref<RocketGameState | null>(null);
 
 // Toggle Rocket Pilot Exploration Mode
 const onToggleRocket = () => {
+  if (isLoading.value) return; // Prevent activation while initial assets are loading
   if (window.innerWidth < 768) return; // Desktop only
 
   if (isRocketMode.value) {
@@ -42,6 +61,7 @@ const onRocketStateUpdate = (state: RocketGameState) => {
 
 // Global Hotkey for Rocket Mode [R] (Desktop only, when not in text input or modal)
 const onGlobalKeyDown = (e: KeyboardEvent) => {
+  if (isLoading.value) return; // Ignore hotkey while loading
   if (e.code === 'KeyR' && !isModalOpen.value && window.innerWidth >= 768) {
     const target = e.target as HTMLElement | null;
     if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
@@ -120,6 +140,13 @@ const onNavbarNavigate = (target: 'sun' | 'skills' | 'projects') => {
 
 <template>
   <div class="relative w-full h-screen font-mono text-white overflow-hidden bg-[#02040a] select-none">
+    <!-- INITIAL SCI-FI SYSTEM LOADING SCREEN -->
+    <LoadingScreen
+      :is-loading="isLoading"
+      :progress="loadingProgress"
+      :message="loadingMessage"
+    />
+
     <!-- Navbar Header (Hidden in Rocket Mode for cockpit immersion) -->
     <Navbar v-if="!isRocketMode" @navigate="onNavbarNavigate" />
 
@@ -134,6 +161,8 @@ const onNavbarNavigate = (target: 'sun' | 'skills' | 'projects') => {
         @unselect="onCloseModal"
         @rocket-state="onRocketStateUpdate"
         @rocket-exit="onRocketExit"
+        @load-progress="onLoadProgress"
+        @loaded="onCanvasLoaded"
       />
     </main>
 

@@ -254,16 +254,15 @@ export class RocketGameManager {
     const group = new THREE.Group();
 
     // ── 0. INTEGRATED LOCAL SHIP ILLUMINATION RIG ──────────────────────────
-    const shipKeyLight = new THREE.DirectionalLight(0xffffff, 2.8);
-    shipKeyLight.position.set(16, 24, 18);
+    // Local point lights with controlled falloff distance (only illuminates the starfighter,
+    // avoiding scene-wide shader invalidation and light leakage across the cosmos)
+    const shipKeyLight = new THREE.PointLight(0xffffff, 2.6, 65, 1.2);
+    shipKeyLight.position.set(12, 16, -6);
     group.add(shipKeyLight);
 
-    const shipRimLight = new THREE.DirectionalLight(0x38bdf8, 2.0);
-    shipRimLight.position.set(-16, -10, 14);
+    const shipRimLight = new THREE.PointLight(0x38bdf8, 2.2, 55, 1.2);
+    shipRimLight.position.set(-12, -8, 8);
     group.add(shipRimLight);
-
-    const shipFillLight = new THREE.HemisphereLight(0xffffff, 0x0f172a, 1.1);
-    group.add(shipFillLight);
 
     // ── HIGH-TECH SCI-FI MATERIALS ──────────────────────────────────────────
     // Deep Space Stealth Titanium / Gunmetal Composite Hull
@@ -271,6 +270,8 @@ export class RocketGameManager {
       color: 0x1e293b,
       metalness: 0.8,
       roughness: 0.28,
+      emissive: new THREE.Color(0x0a1020),
+      emissiveIntensity: 0.25,
     });
 
     // Midnight Cobalt & Electric Cyan Armor Plating
@@ -278,6 +279,8 @@ export class RocketGameManager {
       color: 0x0284c7,
       metalness: 0.6,
       roughness: 0.22,
+      emissive: new THREE.Color(0x023e8a),
+      emissiveIntensity: 0.3,
     });
 
     // Arctic Ceramic White Markings & Trim (High contrast in deep space!)
@@ -285,6 +288,8 @@ export class RocketGameManager {
       color: 0xf8fafc,
       metalness: 0.3,
       roughness: 0.25,
+      emissive: new THREE.Color(0x94a3b8),
+      emissiveIntensity: 0.2,
     });
 
     // Obsidian Tungsten Carbon Structural Framework
@@ -300,6 +305,8 @@ export class RocketGameManager {
       metalness: 0.9,
       roughness: 0.22,
       side: THREE.DoubleSide,
+      emissive: new THREE.Color(0x1e293b),
+      emissiveIntensity: 0.2,
     });
 
     // High-Luminance Electric Cyan Neon Glow Panels
@@ -308,14 +315,15 @@ export class RocketGameManager {
     // Pure White-Hot Plasma Glow
     const glowWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-    // Cockpit Glass - Iridescent Iridium Cyan Crystal Glass
-    const glassMat = new THREE.MeshPhysicalMaterial({
+    // Cockpit Glass - Iridescent Iridium Cyan Crystal Glass (Optimized for instant 60fps compile)
+    const glassMat = new THREE.MeshStandardMaterial({
       color: 0x38bdf8,
       metalness: 0.2,
-      roughness: 0.05,
-      transmission: 0.88,
+      roughness: 0.06,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.75,
+      emissive: new THREE.Color(0x0284c7),
+      emissiveIntensity: 0.35,
     });
 
     // ── 1. CENTERLINE FUSELAGE & NEEDLE NOSE (X = 0) ──────────────────────

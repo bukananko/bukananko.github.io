@@ -26,6 +26,8 @@ const emit = defineEmits<{
   (e: 'unselect'): void;
   (e: 'rocket-state', state: RocketGameState): void;
   (e: 'rocket-exit'): void;
+  (e: 'loaded'): void;
+  (e: 'load-progress', data: { progress: number; message: string }): void;
 }>();
 
 // Rocket Game Flight Exploration Mode
@@ -7388,10 +7390,12 @@ const onVisibilityChange = () => {
 };
 
 onMounted(() => {
+  emit('load-progress', { progress: 20, message: 'Menginisialisasi Engine Tiga Dimensi & Kamera...' });
   initThreeScene();
   window.addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', onVisibilityChange);
-  animationFrameId = requestAnimationFrame(renderLoop);
+
+  emit('load-progress', { progress: 55, message: 'Membangun Formasi Planet & Jaringan Orbit...' });
 
   // Initialize Rocket Game Flight Manager
   rocketGame = new RocketGameManager(scene, camera);
@@ -7407,6 +7411,28 @@ onMounted(() => {
       emit('rocket-exit');
     }
   };
+
+  emit('load-progress', { progress: 85, message: 'Memanaskan Shader GPU & Valkyrie-X Hyperdrive...' });
+
+  // Pre-warm and pre-compile all scene shaders including the rocket & warp field!
+  // This guarantees 0ms freeze / 0ms stutter when switching to Rocket Mode!
+  if (rocketGame && renderer && scene && camera) {
+    rocketGame.rocketGroup.visible = true;
+    rocketGame.warpFieldGroup.visible = true;
+    renderer.compile(scene, camera);
+    renderer.render(scene, camera);
+    rocketGame.rocketGroup.visible = false;
+    rocketGame.warpFieldGroup.visible = false;
+  }
+
+  emit('load-progress', { progress: 100, message: 'Sistem Siap! Memulai Eksplorasi Kosmik...' });
+
+  animationFrameId = requestAnimationFrame(renderLoop);
+
+  // Short delay before emitting loaded to ensure smooth transition
+  setTimeout(() => {
+    emit('loaded');
+  }, 400);
 });
 
 onUnmounted(() => {
